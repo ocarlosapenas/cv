@@ -1,0 +1,138 @@
+# Single source of truth for the CV. Schema: schemas/cv.schema.json.
+#
+# PHASE 1 PLACEHOLDER: every person, company and number below is fictitious. Real
+# content arrives in Phase 2, item by item, after review.
+#
+# Conventions
+# - Field names follow JSON Resume (https://jsonresume.org/schema).
+# - A value can differ per variant: {default: ..., ai: ..., fde: ...}.
+# - `tags: [ai, fde]` limits an entry or bullet to those variants; no tags = all.
+# - `status: verify` marks a claim that still needs confirmation; releases are blocked
+#   while any remain (Phase 3).
+# - No phone or street address here, ever: see CONFIDENTIALITY.md.
+
+meta:
+  variants:
+    backend:
+      sections: [summary, skills, work, projects, education, certificates, languages]
+      max_pages: 2
+    ai:
+      sections: [summary, projects, work, skills, education, certificates, languages]
+      max_pages: 2
+    fde:
+      sections: [summary, work, projects, skills, education, certificates, languages]
+      max_pages: 2
+
+basics:
+  name: Alex Example
+  label:
+    default: Senior Backend and DevOps Engineer
+    ai: Senior Backend Engineer building with LLMs
+    fde: Senior Backend Engineer, customer-facing delivery
+  email: alex@example.com
+  url: https://example.com
+  location:
+    city: Springfield
+    countryCode: BR
+    country: Brazil
+    remote: Remote
+    timezone: UTC-3
+  profiles:
+    - network: LinkedIn
+      username: alex-example
+      url: https://www.linkedin.com/in/alex-example
+    - network: GitHub
+      username: alex-example
+      url: https://github.com/alex-example
+  summary:
+    default: >-
+      Backend and DevOps engineer with 15 years in PHP services, Linux operations and
+      AWS. Runs a weekly multi-repository release train and leads incident root-cause
+      analysis.
+    ai: >-
+      Backend engineer with 15 years in production systems, now building LLM features
+      with measured evals. Brings release discipline and root-cause analysis to
+      non-deterministic software.
+    fde: >-
+      Backend engineer with 15 years shipping production systems for paying customers.
+      Comfortable owning integration, deployment and debugging end to end.
+
+work:
+  - name: Example Ads Inc.
+    position:
+      default: Senior Backend Engineer
+      fde: Senior Backend and Infrastructure Engineer
+    location: Remote, US company
+    startDate: "2023-07"
+    summary: >-
+      Backend services for an advertising platform and the AWS infrastructure behind them.
+    highlights:
+      - Migrated a 250 GB production database to managed hosting with under 2 hours of downtime.
+      - Kept an ingestion API serving 20M+ pageviews per day across client sites.
+      - text: Cut monthly cloud spend by about 25 percent through right-sizing and reserved capacity.
+        status: verify
+      - text: Built internal agent skills that turn release and incident runbooks into repeatable checks.
+        tags: [ai, fde]
+      - text: Coordinated a weekly release train across 7 repositories with automated rollback.
+        tags: [backend, fde]
+      - text: Triaged customer-reported integration failures and shipped fixes with the account team.
+        tags: [fde]
+  - name: Fleet Software Ltda.
+    position: Backend Developer
+    location: Remote
+    startDate: "2022-01"
+    endDate: "2023-06"
+    highlights:
+      - Rebuilt a dealership management app on Laravel and Vue with unit and feature tests.
+      - Replaced 6 image-processing servers with 2 after a serverless proof of concept.
+  - name: State Agency
+    position: Software Developer
+    startDate: "2013"
+    endDate: "2021"
+    compact: true
+
+projects:
+  - name: Release Copilot
+    description: Open-source agent that reviews release notes against merged pull requests.
+    url: https://github.com/alex-example/release-copilot
+    startDate: "2026-09"
+    highlights:
+      - text: Frozen eval set of 120 real releases gates every prompt change in CI.
+        status: verify
+    keywords: [Python, Anthropic SDK, evals]
+    tags: [ai, fde]
+  - name: Homelab as code
+    description: Personal infrastructure rebuilt from code with OpenTofu and Ansible.
+    url: https://github.com/alex-example/homelab
+    startDate: "2026-06"
+    highlights:
+      - Destroyed and recreated the production host from code to prove recovery.
+    keywords: [OpenTofu, Ansible, GitHub Actions]
+    tags: [backend]
+
+skills:
+  - name: Backend
+    keywords: [PHP, Laravel, REST APIs, MySQL, Redis]
+  - name: Cloud and operations
+    keywords: [AWS, Linux, Docker, GitHub Actions, OpenTofu]
+  - name: AI engineering
+    keywords: [Python, LLM APIs, evals, MCP]
+    tags: [ai, fde]
+
+education:
+  - institution: Federal Technical University
+    studyType: Associate degree
+    area: Systems Analysis
+    startDate: "2008"
+    endDate: "2011"
+
+certificates:
+  - name: Cloud Practitioner
+    issuer: Example Cloud
+    date: "2024"
+
+languages:
+  - language: English
+    fluency: Professional
+  - language: Portuguese
+    fluency: Native

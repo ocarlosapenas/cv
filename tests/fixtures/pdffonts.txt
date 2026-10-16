@@ -1,0 +1,5 @@
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+UREVRP+NewCM10-Bold-Identity-H       CID Type 0C       Identity-H       yes yes yes    104  0
+UPSGEZ+NewCM10-Regular-Identity-H    CID Type 0C       Identity-H       yes yes yes    107  0
+FTLMCR+NewCM10-Italic-Identity-H     CID Type 0C       Identity-H       yes yes yes    110  0

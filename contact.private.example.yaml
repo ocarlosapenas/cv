@@ -1,0 +1,5 @@
+# Format of private/contact.private.yaml (gitignored). Copy it there with real values.
+# Only `make private` reads it; public builds never do, and the checks fail if any of
+# these values shows up in a public output.
+phone: "+1 555 010 0000"
+email: "alex.private@example.com"

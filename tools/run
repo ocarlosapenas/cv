@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Run one command inside the pinned cvkit container.
+# Usage (from the repository root): tools/run <command> [args...]
+#
+# Same isolation baseline as dockerized-tools: only the repository is mounted, no
+# network, no capabilities, read-only root, files owned by the host user.
+set -euo pipefail
+
+IMAGE="cv/cvkit:pinned"
+TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(dirname "$TOOLS_DIR")"
+
+# Paths inside the container are relative to /work, so it must be the repository.
+if [ "$PWD" != "$REPO_DIR" ]; then
+  echo "tools/run: run from the repository root ($REPO_DIR)." >&2
+  exit 1
+fi
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  echo "tools/run: image $IMAGE not found. Run tools/build.sh first." >&2
+  exit 1
+fi
+
+want="$(cat "$TOOLS_DIR/Dockerfile" "$TOOLS_DIR/tools.env" | shasum -a 256 | cut -d' ' -f1)"
+have="$(docker image inspect --format '{{ index .Config.Labels "cv.toolchain.hash" }}' "$IMAGE")"
+if [ "$want" != "$have" ]; then
+  echo "tools/run: image $IMAGE is stale (tools/Dockerfile or tools/tools.env changed)." >&2
+  echo "Run tools/build.sh to rebuild it." >&2
+  exit 1
+fi
+
+# Attach a TTY only when there is one, so make and pipelines keep working.
+tty_flags=()
+if [ -t 0 ] && [ -t 1 ]; then tty_flags=(-it); fi
+
+exec docker run --rm ${tty_flags[@]+"${tty_flags[@]}"} \
+  --network none \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/tmp \
+  -e PYTHONDONTWRITEBYTECODE=1 \
+  -v "$PWD":/work -w /work \
+  --cap-drop ALL \
+  --security-opt no-new-privileges \
+  --read-only --tmpfs /tmp \
+  "$IMAGE" "$@"

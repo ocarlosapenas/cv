@@ -1,0 +1,10 @@
+# Build outputs are reproducible from cv.yaml; releases carry the published PDFs.
+build/
+
+# Local-only data: private contact details, the confidentiality deny-list and the
+# research notes. Never committed, never sent to CI.
+private/
+
+__pycache__/
+.pytest_cache/
+.DS_Store
