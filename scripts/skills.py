@@ -45,6 +45,8 @@ def load_config(data):
         "confirmed": dict(data.get("confirmed") or {}),
         "evidence": list(data.get("evidence") or []),
         "linkedin_skills": list(data.get("linkedin_skills") or []),
+        "linkedin_top_skills": list(data.get("linkedin_top_skills") or []),
+        "linkedin_skills_keep": list(data.get("linkedin_skills_keep") or []),
     }
 
 
@@ -62,7 +64,8 @@ def merge_configs(*configs):
         merged["vocabulary"] += [t for t in config["vocabulary"] if t not in merged["vocabulary"]]
         merged["confirmed"].update(config["confirmed"])
         merged["evidence"] += config["evidence"]
-        merged["linkedin_skills"] = config["linkedin_skills"] or merged["linkedin_skills"]
+        for key in ("linkedin_skills", "linkedin_top_skills", "linkedin_skills_keep"):
+            merged[key] = config[key] or merged[key]
     return merged
 
 
@@ -88,9 +91,14 @@ def format_month(index):
     return f"{index // 12}-{index % 12 + 1:02d}"
 
 
+def _default(value):
+    # Dates may differ per variant (e.g. LinkedIn splits a role); evidence uses the default.
+    return value["default"] if isinstance(value, dict) else value
+
+
 def _entries(doc, config):
     for w in doc.get("work", []):
-        yield w["name"], w.get("startDate"), w.get("endDate"), w.get("stack", [])
+        yield w["name"], _default(w.get("startDate")), _default(w.get("endDate")), w.get("stack", [])
     for p in doc.get("projects", []):
         yield p["name"], p.get("startDate"), p.get("endDate"), list(p.get("stack", [])) + list(p.get("keywords", []))
     for v in doc.get("volunteer", []):

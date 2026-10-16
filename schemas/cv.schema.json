@@ -157,13 +157,13 @@
             "$ref": "#/definitions/url"
           },
           "location": {
-            "$ref": "#/definitions/text"
+            "$ref": "#/definitions/variantText"
           },
           "startDate": {
-            "$ref": "#/definitions/date"
+            "$ref": "#/definitions/variantDate"
           },
           "endDate": {
-            "$ref": "#/definitions/date"
+            "$ref": "#/definitions/variantDate"
           },
           "summary": {
             "$ref": "#/definitions/variantText"
@@ -179,6 +179,9 @@
           },
           "stack": {
             "$ref": "#/definitions/stack"
+          },
+          "employmentType": {
+            "$ref": "#/definitions/text"
           }
         },
         "if": {
@@ -503,6 +506,22 @@
           }
         ]
       }
+    },
+    "variantDate": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/date"
+        },
+        {
+          "type": "object",
+          "required": [
+            "default"
+          ],
+          "additionalProperties": {
+            "$ref": "#/definitions/date"
+          }
+        }
+      ]
     }
   }
 }

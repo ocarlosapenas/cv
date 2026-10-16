@@ -188,14 +188,16 @@ def resolve(doc, variant, version="dev", private=None):
         if not _included(w, variant):
             continue
         compact = bool(w.get("compact"))
+        start, end = _pick(w["startDate"], variant), _pick(w.get("endDate"), variant)
         work.append(_drop_none({
             "name": _text(w["name"]),
             "position": _pick(w["position"], variant),
             "url": w.get("url"),
-            "location": _text(w.get("location")),
-            "startDate": w["startDate"],
-            "endDate": w.get("endDate"),
-            "dates": date_range(w["startDate"], w.get("endDate")),
+            "location": _pick(w.get("location"), variant),
+            "employmentType": _text(w.get("employmentType")),
+            "startDate": start,
+            "endDate": end,
+            "dates": date_range(start, end),
             "summary": _pick(w["summary"], variant) if w.get("summary") else None,
             "highlights": _bullets(w.get("highlights"), variant),
             "compact": compact,

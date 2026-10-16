@@ -131,6 +131,29 @@ def test_text_whitespace_collapsed(doc):
     assert resolve(doc, "backend")["basics"]["summary"] == "Line one line two."
 
 
+def test_dates_and_location_can_differ_per_variant(doc, schema_path):
+    doc["meta"]["variants"]["linkedin"] = {"sections": ["work"]}
+    doc["work"][0]["startDate"] = {"default": "2023-07", "linkedin": "2024-06"}
+    doc["work"][0]["location"] = {"default": "Remote, U.S. company", "linkedin": "United States"}
+    validate_cv(doc, schema_path)
+    li = resolve(doc, "linkedin")["work"][0]
+    assert (li["startDate"], li["dates"], li["location"]) == ("2024-06", "Jun 2024 – Present", "United States")
+    be = resolve(doc, "backend")["work"][0]
+    assert (be["startDate"], be["dates"], be["location"]) == ("2023-07", "Jul 2023 – Present", "Remote, U.S. company")
+
+
+def test_per_variant_date_still_checked(doc, schema_path):
+    doc["work"][0]["startDate"] = {"default": "July 2023"}
+    with pytest.raises(CVError):
+        validate_cv(doc, schema_path)
+
+
+def test_employment_type_passed_through(doc, schema_path):
+    doc["work"][0]["employmentType"] = "Full-time"
+    validate_cv(doc, schema_path)
+    assert resolve(doc, "backend")["work"][0]["employmentType"] == "Full-time"
+
+
 def test_paragraph_breaks_are_kept(doc):
     doc["basics"]["summary"] = "First paragraph\nstill first.\n\n  Second   paragraph.\n"
     assert resolve(doc, "backend")["basics"]["summary"] == "First paragraph still first.\n\nSecond paragraph."

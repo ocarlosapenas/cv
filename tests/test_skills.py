@@ -52,6 +52,12 @@ def test_stack_item_with_own_dates_and_approximate_years(doc, config):
     assert python["months"] == 12 and python["approx"] is True
 
 
+def test_evidence_uses_default_period_when_dates_differ_per_variant(doc, config):
+    doc["work"][0]["startDate"] = {"default": "2023-07", "linkedin": "2024-06"}
+    doc["work"][0]["stack"] = ["Go"]
+    assert row(skill_report(doc, config, today="2024-06"), "Go")["months"] == 12
+
+
 def test_aliases_canonicalize_stack_names(doc, config):
     doc["work"][0]["stack"] = ["docker products"]
     assert row(skill_report(doc, config, today="2024-06"), "Docker")["months"] == 12

@@ -93,6 +93,36 @@ def test_checklist_uses_raw_skill_list_to_find_duplicates(doc):
     assert items["skills_remove"] == ["laravel (duplicate)"]
 
 
+CONFIG_SYNCED = load_config({
+    "aliases": {"Docker": ["Docker Products"]},
+    "linkedin_skills": ["PHP", "Laravel", "Docker", "Git"],
+    "linkedin_top_skills": ["Laravel", "PHP"],
+    "linkedin_skills_keep": ["git", "Bitcoin"],
+})
+
+
+def test_top_skills_keep_list_contact_and_employment_type(doc):
+    doc["work"][0]["employmentType"] = "Full-time"
+    texts = build_texts(linkedin_model(doc), CONFIG_SYNCED)
+    assert texts["top_skills"] == ["Laravel", "PHP"]
+    assert texts["skills_keep"] == ["git", "Bitcoin"]
+    assert texts["contact"]["email"] == "alex@example.com"
+    assert texts["experience"][0]["type"] == "Full-time"
+
+
+def test_top_skills_limit_checked(doc):
+    texts = build_texts(linkedin_model(doc), CONFIG_SYNCED)
+    texts["top_skills"] = ["a", "b", "c", "d", "e", "f"]
+    assert ("top skills (count)", "over") in {(r["field"], r["status"]) for r in check_limits(texts)}
+
+
+def test_checklist_respects_keep_list_by_exact_name(doc):
+    current = {"skills_raw": ["Laravel", "PHP", "Docker", "Git", "git", "laravel", "Bitcoin"]}
+    items = checklist(build_texts(linkedin_model(doc), CONFIG_SYNCED), current, CONFIG_SYNCED)
+    assert items["skills_remove"] == ["laravel (duplicate)"]
+    assert items["skills_add"] == []
+
+
 def test_checklist_skills_add_and_remove_with_aliases(doc):
     items = checklist(build_texts(linkedin_model(doc), CONFIG), EXPORT, CONFIG)
     assert items["skills_add"] == ["PHP"]

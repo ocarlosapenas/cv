@@ -24,7 +24,8 @@ from skills import canonical, merge_configs, read_config
 # Character limits. Sources (see the Phase 0 research): LinkedIn Help for the number of
 # skills; third-party measurements (Sept 2026) for the others. Fields marked "assumed"
 # have no published limit; the experience limit is applied to them as a safe default.
-LIMITS = {"headline": 220, "about": 2600, "title": 100, "company": 100, "location": 100, "description": 2000, "skills_count": 100}
+LIMITS = {"headline": 220, "about": 2600, "title": 100, "company": 100, "location": 100, "description": 2000, "skills_count": 100,
+          "top_skills_count": 5}
 ASSUMED = {"volunteer description", "project description"}
 NEAR = 0.95
 
@@ -46,7 +47,7 @@ def build_texts(model, config):
         "about": b.get("summary", ""),
         "experience": [
             {"company": w["name"], "title": w["position"], "location": w.get("location", ""),
-             "start": w["startDate"], "end": w.get("endDate"),
+             "type": w.get("employmentType"), "start": w["startDate"], "end": w.get("endDate"),
              "description": "" if w.get("compact") else format_description(w)}
             for w in model["work"]
         ],
@@ -70,6 +71,9 @@ def build_texts(model, config):
             for c in model.get("certificates", [])
         ],
         "skills": list(config["linkedin_skills"]),
+        "top_skills": list(config["linkedin_top_skills"]),
+        "skills_keep": list(config["linkedin_skills_keep"]),
+        "contact": {"website": b.get("url"), "email": b.get("email")},
     }
 
 
@@ -89,9 +93,12 @@ def check_limits(texts):
         rows.append(_row(f"volunteer[{v['organization']}].description", v["description"], LIMITS["description"]))
     for p in texts.get("projects", []):
         rows.append(_row(f"project[{p['name']}].description", p["description"], LIMITS["description"]))
-    count = len(texts.get("skills", []))
+    count = len(texts.get("skills", [])) + len(texts.get("skills_keep", []))
     rows.append({"field": "skills (count)", "length": count, "limit": LIMITS["skills_count"],
                  "status": "over" if count > LIMITS["skills_count"] else "ok"})
+    top = len(texts.get("top_skills", []))
+    rows.append({"field": "top skills (count)", "length": top, "limit": LIMITS["top_skills_count"],
+                 "status": "over" if top > LIMITS["top_skills_count"] else "ok"})
     return rows
 
 
@@ -161,8 +168,11 @@ def checklist(texts, current, config):
 
     current_skills = current.get("skills_raw") or [k for group in current.get("skills", []) for k in group.get("keywords", [])]
     wanted = {canonical(s, config).casefold() for s in texts["skills"]}
+    keep = set(texts.get("skills_keep", []))  # exact names kept on LinkedIn by decision
     have, remove = set(), []
     for skill in current_skills:
+        if skill in keep:
+            continue
         key = canonical(skill, config).casefold()
         if key in have:
             remove.append(f"{skill} (duplicate)")
@@ -211,10 +221,17 @@ def write_outputs(texts, limits, items, out):
     os.makedirs(out, exist_ok=True)
     lines = ["# LinkedIn profile texts", "", "Paste each block into the matching LinkedIn field. Generated from cv.yaml (target `linkedin`).", ""]
     lines += _block("Headline", texts["headline"], LIMITS["headline"]) + _block("About", texts["about"], LIMITS["about"])
+    if texts.get("top_skills"):
+        lines += [f"### About: Top skills ({len(texts['top_skills'])} / {LIMITS['top_skills_count']}, in this order)", "",
+                  ", ".join(texts["top_skills"]), ""]
+    contact = texts.get("contact") or {}
+    if any(contact.values()):
+        lines += ["### Contact info", ""] + [f"- {k}: `{v}`" for k, v in contact.items() if v] + [""]
     lines += ["## Experience", ""]
     for i, e in enumerate(texts["experience"], 1):
         period = f"{e['start']} to {e['end'] or 'present'}"
-        lines += [f"**{e['title']}** at **{e['company']}** · {e['location'] or 'no location'} · {period}", ""]
+        kind = f" · {e['type']}" if e.get("type") else ""
+        lines += [f"**{e['title']}** at **{e['company']}**{kind} · {e['location'] or 'no location'} · {period}", ""]
         if e["description"]:
             lines += _block(f"Description: {e['company']}", e["description"], LIMITS["description"])
             with open(os.path.join(out, f"experience-{i:02d}-{_slug(e['company'])}.txt"), "w", encoding="utf-8") as fh:
@@ -230,6 +247,9 @@ def write_outputs(texts, limits, items, out):
     lines += ["## Certifications", ""] + [f"- **{c['name']}**, {c['issuer']} ({c['date']}) {c['url'] or ''}" for c in texts["certificates"]] + [""]
     lines += [f"## Skills ({len(texts['skills'])} / {LIMITS['skills_count']}, in this order; pin the first 3)", ""]
     lines += [", ".join(texts["skills"]), ""]
+    if texts.get("skills_keep"):
+        lines += [f"### Kept on LinkedIn by decision, not in the CV ({len(texts['skills_keep'])})", "",
+                  ", ".join(texts["skills_keep"]), ""]
     with open(os.path.join(out, "profile.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
     for name in ("headline", "about"):
