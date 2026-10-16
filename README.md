@@ -3,7 +3,8 @@
 CV as code: one `cv.yaml`, three role variants, each rendered to a tagged, ATS-clean
 PDF and to a JSON Resume file, with automated checks on every output.
 
-> **Phase 1:** `cv.yaml` holds fictitious placeholder data. Real content comes in Phase 2.
+> **Phase 2:** `cv.yaml` holds real content under review. Claims marked
+> `status: verify` are not confirmed yet.
 
 ## Quickstart
 

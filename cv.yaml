@@ -1,138 +1,226 @@
 # Single source of truth for the CV. Schema: schemas/cv.schema.json.
 #
-# PHASE 1 PLACEHOLDER: every person, company and number below is fictitious. Real
-# content arrives in Phase 2, item by item, after review.
+# PHASE 2 (2026-10-16): content confirmed by the owner. A new claim marked
+# `status: verify` still needs the owner's confirmation; releases are blocked while
+# any remain (Phase 3).
 #
 # Conventions
 # - Field names follow JSON Resume (https://jsonresume.org/schema).
 # - A value can differ per variant: {default: ..., ai: ..., fde: ...}.
 # - `tags: [ai, fde]` limits an entry or bullet to those variants; no tags = all.
-# - `status: verify` marks a claim that still needs confirmation; releases are blocked
-#   while any remain (Phase 3).
 # - No phone or street address here, ever: see CONFIDENTIALITY.md.
 
 meta:
   variants:
     backend:
-      sections: [summary, skills, work, projects, education, certificates, languages]
+      sections: [summary, skills, work, projects, volunteer, education, certificates, languages]
       max_pages: 2
     ai:
-      sections: [summary, projects, work, skills, education, certificates, languages]
+      sections: [summary, work, skills, projects, volunteer, education, certificates, languages]
       max_pages: 2
     fde:
-      sections: [summary, work, projects, skills, education, certificates, languages]
+      sections: [summary, work, projects, volunteer, skills, education, certificates, languages]
       max_pages: 2
 
 basics:
-  name: Alex Example
+  name: Carlos Apenas
   label:
     default: Senior Backend and DevOps Engineer
-    ai: Senior Backend Engineer building with LLMs
-    fde: Senior Backend Engineer, customer-facing delivery
-  email: alex@example.com
-  url: https://example.com
+    ai: Senior Backend Engineer, agentic engineering on production systems
+    fde: Senior Backend Engineer, production systems end to end
+  email: cv@carlosapenas.dev
+  url: https://carlosapenas.dev
   location:
-    city: Springfield
+    city: Ponta Grossa
     countryCode: BR
     country: Brazil
     remote: Remote
     timezone: UTC-3
   profiles:
     - network: LinkedIn
-      username: alex-example
-      url: https://www.linkedin.com/in/alex-example
+      username: ocarlosapenas
+      url: https://www.linkedin.com/in/ocarlosapenas
     - network: GitHub
-      username: alex-example
-      url: https://github.com/alex-example
+      username: ocarlosapenas
+      url: https://github.com/ocarlosapenas
   summary:
     default: >-
-      Backend and DevOps engineer with 15 years in PHP services, Linux operations and
-      AWS. Runs a weekly multi-repository release train and leads incident root-cause
-      analysis.
+      Backend and DevOps engineer with 15 years in production systems. Runs the backend
+      services, AWS infrastructure and weekly multi-repository release train for a U.S.
+      adtech platform serving 20M+ pageviews per day. Strongest at root cause analysis that
+      ends in automated prevention: CI quality gates, deploy verification with rollback and
+      alerting.
     ai: >-
-      Backend engineer with 15 years in production systems, now building LLM features
-      with measured evals. Brings release discipline and root-cause analysis to
-      non-deterministic software.
+      Backend engineer with 15 years in production systems who directs coding agents on real
+      brownfield code. Builds Claude Code skills, MCP tooling and multi-agent workflows with
+      adversarial review, and treats agent output as a hypothesis until tests, logs and
+      runtime data confirm it. Owns backend services, AWS infrastructure and releases for a
+      U.S. adtech platform serving 20M+ pageviews per day.
     fde: >-
-      Backend engineer with 15 years shipping production systems for paying customers.
-      Comfortable owning integration, deployment and debugging end to end.
+      Backend engineer with 15 years shipping and running production systems. Owns backend
+      services, AWS infrastructure, releases and incident response for a U.S. adtech platform
+      serving 20M+ pageviews per day. Fluent in English and used to working remotely with
+      U.S. teams.
 
 work:
-  - name: Example Ads Inc.
+  - name: AdMetricsPro
     position:
       default: Senior Backend Engineer
       fde: Senior Backend and Infrastructure Engineer
-    location: Remote, US company
+    location: Remote, U.S. company
     startDate: "2023-07"
     summary: >-
-      Backend services for an advertising platform and the AWS infrastructure behind them.
+      Backend services, AWS infrastructure and releases for a U.S. programmatic advertising
+      platform. Contractor through Proxify from Jul 2023; hired directly as a full-time
+      employee in Jun 2024.
     highlights:
-      - Migrated a 250 GB production database to managed hosting with under 2 hours of downtime.
-      - Kept an ingestion API serving 20M+ pageviews per day across client sites.
-      - text: Cut monthly cloud spend by about 25 percent through right-sizing and reserved capacity.
-        status: verify
-      - text: Built internal agent skills that turn release and incident runbooks into repeatable checks.
-        tags: [ai, fde]
-      - text: Coordinated a weekly release train across 7 repositories with automated rollback.
+      - Led the move from a VPS to AWS (EC2, RDS, ALB, ACM), including a 250 GB MariaDB migration with under 2 hours of downtime.
+      - Build and operate PHP/Laravel APIs and queue-driven ingestion services on AWS that handle 20M+ pageviews per day.
+      - text: Coordinate the weekly release train across 7 interconnected repositories with GitHub Actions; added post-deploy verification with automatic rollback and shipped 7 production deploys in under 14 minutes with zero rollbacks.
+      - text: Root-caused 30,000 failed jobs spread across 7 apps, 3 databases and 5 error classes, and found a database lock that a self-healing cron had hidden for months.
+      - text: Traced a multi-tenant isolation bug across 4 hops and 3 repositories.
         tags: [backend, fde]
-      - text: Triaged customer-reported integration failures and shipped fixes with the account team.
-        tags: [fde]
-  - name: Fleet Software Ltda.
-    position: Backend Developer
+      - text: Cut AWS spend by about 25% with right-sizing, RDS Reserved Instances and Compute Savings Plans.
+        tags: [backend, fde]
+      - text: Upgraded core services to Laravel 13 and Passport 13 with zero ERROR or CRITICAL logs after release, and migrated ElastiCache from Redis 6.2 to Valkey 8.2 in production in 12 minutes.
+        tags: [backend]
+      - text: Built data-freshness alerting for the ingestion pipeline, daily infrastructure drift checks and AWS budget alerts.
+        tags: [backend, fde]
+      - text: Created an org-wide GitHub Actions quality gate (Infection mutation testing, PHPStan, PHPMD, Deptrac) and raised a mutation score from 69% to 93% as an acceptance criterion.
+        tags: [backend]
+      - text: Integrated Stripe billing, delivered PCI DSS SAQ A remediation in production, and closed 26 of 29 dependency security advisories with self-hosted Renovate.
+        tags: [backend, fde]
+      - text: Built Claude Code skills (some over 1,000 lines) and MCP-based tooling used for branch creation, the weekly release train and the dependency security cycle.
+        tags: [ai, fde]
+      - text: Run multi-agent workflows on legacy multi-repository code with worktree-per-epic isolation, adversarial review by a fresh agent and a triple-evidence rule before any conclusion is accepted.
+        tags: [ai]
+      - text: Analyzed agent failures (fabricated output, out-of-scope actions, silent scheduled-task failures) and turned each one into a guardrail.
+        tags: [ai]
+
+  - name: Revenda Mais
+    position: Senior Software Engineer
     location: Remote
-    startDate: "2022-01"
-    endDate: "2023-06"
+    startDate: "2022-03"
+    endDate: "2023-05"
+    summary: SaaS for car dealership management.
     highlights:
-      - Rebuilt a dealership management app on Laravel and Vue with unit and feature tests.
-      - Replaced 6 image-processing servers with 2 after a serverless proof of concept.
-  - name: State Agency
-    position: Software Developer
-    startDate: "2013"
-    endDate: "2021"
+      - Main engineer on the rebuild of the core product, from a legacy Yii 1.1 monolith to a Laravel REST API and a Vue.js frontend, with unit and feature tests.
+      - text: Cut image-processing servers from 6 to 2 with an AWS Lambda proof of concept, lowering infrastructure cost by about 30%.
+
+  - name: Softeo Tecnologia
+    position: Senior Software Engineer
+    location: Remote
+    startDate: "2019-10"
+    endDate: "2022-03"
+    summary: Platform where the franchisees of an advertising network create and manage marketing media.
+    highlights:
+      - Led the team's adoption of Docker, CI/CD and code review.
+      - Integrated payment methods and recurring subscriptions, and built tools that generate marketing artwork as PDF.
+
+  - name: Military Police of Paraná (PMPR)
+    position: Software Engineer
+    location: Ponta Grossa, Brazil
+    startDate: "2013-11"
+    endDate: "2022-01"
+    summary: In-house software for a Brazilian state police force.
+    highlights:
+      - Designed and built Luure from scratch, a Laravel and MySQL system that tracks operations, deadlines and statistics, covering architecture, servers, backend and frontend.
+      - Ran authorized penetration tests with SQLMap on internal applications and reported the vulnerabilities found; they were fixed and the work was commended.
+
+  - name: ICoop Sistemas
+    position: Freelance PHP Developer
+    location: Remote
+    startDate: "2019-07"
+    endDate: "2020-09"
+    summary: Decision-support tools for the branches of a credit union network.
+    highlights:
+      - text: Migrated 100+ databases to Google Cloud and introduced Git for version control.
+    tags: [backend, fde]
+
+  - name: Make Acelerador de Vendas
+    position: Freelance PHP Developer
+    startDate: "2018-01"
+    endDate: "2019-07"
+    compact: true
+    tags: [backend]
+
+  - name: Dr. Designs
+    position: Freelance PHP Developer
+    startDate: "2013-11"
+    endDate: "2018-01"
+    compact: true
+    tags: [backend]
+
+  - name: WebStorm Internet
+    position: PHP Developer
+    startDate: "2011-03"
+    endDate: "2013-01"
     compact: true
 
 projects:
-  - name: Release Copilot
-    description: Open-source agent that reviews release notes against merged pull requests.
-    url: https://github.com/alex-example/release-copilot
-    startDate: "2026-09"
-    highlights:
-      - text: Frozen eval set of 120 real releases gates every prompt change in CI.
-        status: verify
-    keywords: [Python, Anthropic SDK, evals]
-    tags: [ai, fde]
-  - name: Homelab as code
-    description: Personal infrastructure rebuilt from code with OpenTofu and Ansible.
-    url: https://github.com/alex-example/homelab
+  - name: Infrastructure as code homelab
+    description: Personal Proxmox production environment, fully declarative.
     startDate: "2026-06"
     highlights:
-      - Destroyed and recreated the production host from code to prove recovery.
-    keywords: [OpenTofu, Ansible, GitHub Actions]
-    tags: [backend]
+      - text: Rebuilt it with OpenTofu and Ansible (10 roles), then destroyed and recreated production from code to prove recovery.
+      - CI with fmt and validate, tflint, ansible-lint, gitleaks and zizmor; Renovate updates; offsite backups with failure alerts and a dead man's switch.
+    keywords: [OpenTofu, Ansible, Proxmox, GitHub Actions]
+    tags: [backend, fde]
+  - name: QuietRadar
+    description: SaaS that monitors adblock filter lists.
+    highlights:
+      - text: Founder and sole engineer; in validation, on hold since Jun 2026.
+
+volunteer:
+  - organization: Renovo Church
+    position: Volunteer Senior Software Engineer
+    startDate: "2020-05"
+    endDate: "2023-07"
+    highlights:
+      - text: Designed and built from scratch a Laravel and Vue.js e-learning platform for 500+ active students on Docker and DigitalOcean, and led the volunteers who maintained it.
+  - organization: TALKNTALK
+    position: English Conversation Facilitator
+    startDate: "2022-11"
+    endDate: "2025-09"
+    highlights:
+      - text: Led online English conversation sessions, averaging 90% participant satisfaction.
+    tags: [fde]
 
 skills:
   - name: Backend
-    keywords: [PHP, Laravel, REST APIs, MySQL, Redis]
+    keywords: ["PHP 8", "Laravel", "Lumen", "REST APIs", "queues and async jobs", "Stripe"]
   - name: Cloud and operations
-    keywords: [AWS, Linux, Docker, GitHub Actions, OpenTofu]
-  - name: AI engineering
-    keywords: [Python, LLM APIs, evals, MCP]
-    tags: [ai, fde]
+    keywords:
+      - "AWS (EC2, RDS, ALB, ACM, ElastiCache, Lambda, S3, SQS, SNS)"
+      - "Linux (Debian, Amazon Linux)"
+      - "Docker"
+      - "Cloudflare"
+  - name: IaC and CI/CD
+    keywords: ["GitHub Actions", "OpenTofu", "Ansible", "Renovate", "release automation", "automated rollback"]
+  - name: Data
+    keywords: ["MySQL", "MariaDB", "Redis/Valkey", "MongoDB"]
+  - name: Quality and reliability
+    keywords: ["PHPUnit", "TDD", "mutation testing (Infection)", "PHPStan", "root cause analysis", "postmortems"]
+  - name: Agentic engineering
+    keywords: ["Claude Code (custom skills, MCP, multi-agent workflows)", "Cursor", "verification loops"]
+  - name: Frontend
+    keywords: ["Vue.js", "JavaScript"]
 
 education:
-  - institution: Federal Technical University
-    studyType: Associate degree
-    area: Systems Analysis
+  - institution: Federal University of Technology – Paraná (UTFPR)
+    studyType: Technologist degree (3-year undergraduate)
+    area: Systems Analysis and Development
     startDate: "2008"
-    endDate: "2011"
+    endDate: "2012"
 
 certificates:
-  - name: Cloud Practitioner
-    issuer: Example Cloud
-    date: "2024"
+  - name: AWS Certified Cloud Practitioner
+    issuer: Amazon Web Services
+    date: "2024-04"
+    url: https://www.credly.com/badges/1a0e2486-27ee-427d-9dc2-e0f01bf495a1
 
 languages:
   - language: English
-    fluency: Professional
+    fluency: C2 Proficient, EF SET 2022
   - language: Portuguese
     fluency: Native
