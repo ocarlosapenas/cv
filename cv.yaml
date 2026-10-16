@@ -21,6 +21,9 @@ meta:
     fde:
       sections: [summary, work, projects, volunteer, skills, education, certificates, languages]
       max_pages: 2
+    # Not a PDF: source of the paste-ready LinkedIn texts (make linkedin).
+    linkedin:
+      sections: [summary, work, projects, volunteer, skills, education, certificates, languages]
 
 basics:
   name: Carlos Apenas
@@ -28,6 +31,7 @@ basics:
     default: Senior Backend and DevOps Engineer
     ai: Senior Backend Engineer, agentic engineering on production systems
     fde: Senior Backend Engineer, production systems end to end
+    linkedin: Senior Backend Engineer | PHP, Laravel, Linux, AWS | Agentic engineering on production systems | Root cause analysis and postmortems
   email: cv@carlosapenas.dev
   url: https://carlosapenas.dev
   location:
@@ -62,6 +66,18 @@ basics:
       serving 20M+ pageviews per day. Has delivered software for adtech, education,
       marketing, automotive retail, e-commerce, financial services and government. Fluent
       in English and used to working remotely with U.S. teams.
+    linkedin: |-
+      Backend and DevOps engineer with 15 years in production systems, working remotely from Brazil with U.S. teams.
+
+      Today I run the backend services, AWS infrastructure and weekly multi-repository release train for a U.S. adtech platform that serves 20M+ pageviews per day. Recent work: a VPS-to-AWS migration that moved a 250 GB database with under 2 hours of downtime, an AWS spend cut of about 25%, an org-wide CI quality gate, and post-deploy verification with automatic rollback.
+
+      What I do best is root cause analysis that ends in prevention: I debug to the actual cause, prove it is neutralized, and add the check or alert that keeps it from coming back.
+
+      I also direct coding agents on real brownfield code: Claude Code skills, MCP tooling and multi-agent workflows with adversarial review, where agent output stays a hypothesis until tests, logs and runtime data confirm it.
+
+      Stack: PHP, Laravel, MySQL/MariaDB, Redis, AWS (EC2, RDS, ElastiCache, Lambda, S3, SQS, SNS), Linux, Docker, GitHub Actions, OpenTofu, Ansible, Vue.js.
+
+      Contact: cv@carlosapenas.dev · carlosapenas.dev
 
 work:
   - name: AdMetricsPro
@@ -121,19 +137,19 @@ work:
       - text: Traced a multi-tenant isolation bug across 4 hops and 3 repositories.
         tags: [backend, fde]
       - text: Cut AWS spend by about 25% with right-sizing, RDS Reserved Instances and Compute Savings Plans.
-        tags: [backend, fde]
+        tags: [backend, fde, linkedin]
       - text: Upgraded core services to Laravel 13 and Passport 13 with zero ERROR or CRITICAL logs after release, and migrated ElastiCache from Redis 6.2 to Valkey 8.2 in production in 12 minutes.
         tags: [backend]
       - text: Built data-freshness alerting for the ingestion pipeline, daily infrastructure drift checks and AWS budget alerts.
-        tags: [backend, fde]
+        tags: [backend, fde, linkedin]
       - text: Created an org-wide GitHub Actions quality gate (Infection mutation testing, PHPStan, PHPMD, Deptrac) and raised a mutation score from 69% to 93% as an acceptance criterion.
-        tags: [backend]
+        tags: [backend, linkedin]
       - text: Integrated Stripe billing, delivered PCI DSS SAQ A remediation in production, and closed 26 of 29 dependency security advisories with self-hosted Renovate.
         tags: [backend, fde]
       - text: Built Claude Code skills (some over 1,000 lines) and MCP-based tooling used for branch creation, the weekly release train and the dependency security cycle.
-        tags: [ai, fde]
+        tags: [ai, fde, linkedin]
       - text: Run multi-agent workflows on legacy multi-repository code with worktree-per-epic isolation, adversarial review by a fresh agent and a triple-evidence rule before any conclusion is accepted.
-        tags: [ai]
+        tags: [ai, linkedin]
       - text: Analyzed agent failures (fabricated output, out-of-scope actions, silent scheduled-task failures) and turned each one into a guardrail.
         tags: [ai]
 
@@ -197,7 +213,7 @@ work:
     stack: [PHP, Laravel, CodeIgniter, MySQL, SQL, JavaScript, jQuery, HTML, CSS, Google Cloud, Selenium, REST APIs, Git]
     highlights:
       - text: Migrated 100+ databases to Google Cloud and introduced Git for version control.
-    tags: [backend, fde]
+    tags: [backend, fde, linkedin]
 
   - name: Make Acelerador de Vendas
     position: Freelance PHP Developer
@@ -205,7 +221,7 @@ work:
     endDate: "2019-07"
     stack: [PHP, Laravel, Git]
     compact: true
-    tags: [backend]
+    tags: [backend, linkedin]
 
   - name: Dr. Designs
     position: Freelance PHP Developer
@@ -213,7 +229,7 @@ work:
     endDate: "2018-01"
     stack: [PHP, Joomla]
     compact: true
-    tags: [backend]
+    tags: [backend, linkedin]
 
   - name: WebStorm Internet
     position: PHP Developer
@@ -231,7 +247,7 @@ projects:
       - CI with fmt and validate, tflint, ansible-lint, gitleaks and zizmor; Renovate updates; offsite backups with failure alerts and a dead man's switch.
     keywords: [OpenTofu, Ansible, Proxmox, GitHub Actions]
     stack: [Linux, Bash, Cloudflare, Renovate]
-    tags: [backend, fde]
+    tags: [backend, fde, linkedin]
   - name: QuietRadar
     description: SaaS that monitors adblock filter lists.
     highlights:
@@ -251,7 +267,7 @@ volunteer:
     endDate: "2025-09"
     highlights:
       - text: Led online English conversation sessions, averaging 90% participant satisfaction.
-    tags: [fde]
+    tags: [fde, linkedin]
 
 skills:
   - name: Backend
