@@ -77,15 +77,20 @@ basics:
 
       Stack: PHP, Laravel, MySQL/MariaDB, Redis, AWS (EC2, RDS, ElastiCache, Lambda, S3, SQS, SNS), Linux, Docker, GitHub Actions, OpenTofu, Ansible, Vue.js.
 
-      Contact: cv@carlosapenas.dev · carlosapenas.dev
-
 work:
   - name: AdMetricsPro
     position:
       default: Senior Backend Engineer
       fde: Senior Backend and Infrastructure Engineer
-    location: Remote, U.S. company
-    startDate: "2023-07"
+    location:
+      default: Remote, U.S. company
+      linkedin: United States
+    employmentType: Full-time
+    # LinkedIn shows the role as two positions: this one (full-time, from Jun 2024)
+    # and the contract period below, tagged linkedin only.
+    startDate:
+      default: "2023-07"
+      linkedin: "2024-06"
     summary: >-
       Backend services, AWS infrastructure and releases for a U.S. programmatic advertising
       platform. Contractor through Proxify from Jul 2023; hired directly as a full-time
@@ -153,6 +158,15 @@ work:
       - text: Analyzed agent failures (fabricated output, out-of-scope actions, silent scheduled-task failures) and turned each one into a guardrail.
         tags: [ai]
 
+  - name: AdMetricsPro
+    position: Senior Backend Engineer
+    location: United States
+    employmentType: Contract
+    startDate: "2023-07"
+    endDate: "2024-05"
+    compact: true
+    tags: [linkedin]
+
   - name: Revenda Mais
     position: Senior Software Engineer
     location: Remote
@@ -217,6 +231,7 @@ work:
 
   - name: Make Acelerador de Vendas
     position: Freelance PHP Developer
+    location: Ponta Grossa, Brazil
     startDate: "2018-01"
     endDate: "2019-07"
     stack: [PHP, Laravel, Git]
@@ -225,14 +240,25 @@ work:
 
   - name: Dr. Designs
     position: Freelance PHP Developer
+    location: Ponta Grossa, Brazil
     startDate: "2013-11"
     endDate: "2018-01"
     stack: [PHP, Joomla]
     compact: true
     tags: [backend, linkedin]
 
+  - name: Revenda Mais
+    position: Mid-Level Software Engineer
+    location: Curitiba, Brazil
+    startDate: "2013-01"
+    endDate: "2013-10"
+    stack: [PHP]
+    compact: true
+    tags: [linkedin]
+
   - name: WebStorm Internet
     position: PHP Developer
+    location: Ponta Grossa, Brazil
     startDate: "2011-03"
     endDate: "2013-01"
     stack: [PHP]
@@ -308,6 +334,17 @@ certificates:
     issuer: Amazon Web Services
     date: "2024-04"
     url: https://www.credly.com/badges/1a0e2486-27ee-427d-9dc2-e0f01bf495a1
+  # Kept on LinkedIn by decision (2026-10-16), not on the CV.
+  - name: EF SET English Certificate 71/100 (C2 Proficient)
+    issuer: EF SET
+    date: "2022-07"
+    url: https://www.efset.org/cert/dKA1SG
+    tags: [linkedin]
+  - name: Introduction to Digital Currencies
+    issuer: University of Nicosia
+    date: "2022-03"
+    url: https://app.block.co/certificate/0506953b-e288-4546-8887-913e3c52603c/
+    tags: [linkedin]
 
 languages:
   - language: English

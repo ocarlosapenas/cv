@@ -20,7 +20,7 @@ aliases:
   Bootstrap: [Bootstrap (Framework)]
   AWS: [Amazon Web Services, Amazon Web Services (AWS)]
   AWS EC2: [EC2, Amazon EC2]
-  AWS RDS: [RDS, Amazon RDS]
+  AWS RDS: [RDS, Amazon RDS, Amazon Relational Database Service (RDS)]
   AWS S3: [S3, Amazon S3]
   AWS SQS: [SQS, Amazon SQS]
   AWS SNS: [SNS, Amazon SNS]
@@ -36,6 +36,8 @@ aliases:
   Python: [Python (Programming Language)]
   MCP: [Model Context Protocol]
   Electron: [Electron (nodejs)]
+  Lumen: [Laravel Lumen]
+  Stripe: [Stripe (Software)]
   OAuth2: [OAuth, OAuth 2.0]
   Git: [GIT]
   Apache: [Apache HTTP Server, LAMP]
@@ -96,10 +98,6 @@ evidence:
   - where: Career as a software developer (all roles on the CV)
     startDate: "2011-03"
     stack: [Software Development]
-  - where: Revenda Mais 2013 (not on the CV)
-    startDate: "2013-01"
-    endDate: "2013-10"
-    stack: [PHP]
   - where: This repository (CV as code)
     startDate: "2026-10"
     stack:
@@ -116,7 +114,7 @@ linkedin_skills:
   - Laravel
   - Amazon Web Services (AWS)
   - Linux
-  - Docker
+  - Docker Products
   - MySQL
   - MariaDB
   - Redis
@@ -126,11 +124,11 @@ linkedin_skills:
   - Bash
   - Root Cause Analysis
   - Release Engineering
-  - Infrastructure as Code (IaC)
+  - Infrastructure as code (IaC)
   - OpenTofu
   - Ansible
   - AWS Lambda
-  - Amazon RDS
+  - Amazon Relational Database Service (RDS)
   - Amazon EC2
   - Amazon S3
   - Amazon SQS
@@ -140,12 +138,12 @@ linkedin_skills:
   - PHPUnit
   - Mutation Testing
   - PHPStan
-  - Lumen
+  - Laravel Lumen
   - Vue.js
   - JavaScript
   - PostgreSQL
   - MongoDB
-  - Stripe
+  - Stripe (Software)
   - OAuth
   - Python (Programming Language)
   - Claude Code
@@ -159,3 +157,28 @@ linkedin_skills:
   - Scrum
   - Leadership
   - Public Speaking
+
+# Top skills shown in the LinkedIn About section (max 5), as set on 2026-10-16.
+linkedin_top_skills:
+  - Laravel
+  - Amazon Web Services (AWS)
+  - Claude Code
+  - Model Context Protocol (MCP)
+
+# Skills that stay on LinkedIn by decision although they are not on the CV (exact
+# names, so the lowercase "git" with its own Skill Assessment badge is kept too).
+# Not listed here, so still suggested for removal until decided: Desenvolvimento de
+# software, CSS, Electron (nodejs).
+linkedin_skills_keep:
+  - Learning
+  - Pipelines
+  - Decentralization
+  - Blockchain
+  - Bitcoin
+  - English
+  - Cloud Services
+  - Yii
+  - JQuery
+  - OOP (Conceitos de orientação a objetos)
+  - Controle de versão
+  - git
