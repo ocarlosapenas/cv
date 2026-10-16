@@ -98,7 +98,20 @@ def test_dates_display(doc):
 
 def test_sections_follow_variant_order(doc):
     assert [s["key"] for s in resolve(doc, "ai")["sections"]] == ["summary", "work", "skills", "education"]
-    assert [s["title"] for s in resolve(doc, "backend")["sections"]] == ["Summary", "Skills", "Experience", "Education"]
+    assert [s["title"] for s in resolve(doc, "backend")["sections"]] == ["Summary", "Skills", "Experience", "Volunteer", "Education"]
+
+
+def test_volunteer_resolved_and_filtered(doc):
+    backend = resolve(doc, "backend")["volunteer"]
+    assert [v["organization"] for v in backend] == ["Community Group"]
+    assert backend[0]["dates"] == "May 2020 – Jul 2023"
+    assert backend[0]["highlights"] == [{"text": "Built an e-learning platform for 500+ students.", "status": None}]
+    assert [v["organization"] for v in resolve(doc, "ai")["volunteer"]] == ["Community Group", "Talk Club"]
+
+
+def test_verify_count_includes_volunteer(doc):
+    doc["volunteer"][0]["highlights"] = [{"text": "Served 500+ students.", "status": "verify"}]
+    assert resolve(doc, "backend")["meta"]["verify_count"] == 1
 
 
 def test_empty_section_is_dropped(doc):

@@ -21,6 +21,7 @@ SECTION_TITLES = {
     "skills": "Skills",
     "work": "Experience",
     "projects": "Projects",
+    "volunteer": "Volunteer",
     "education": "Education",
     "certificates": "Certifications",
     "languages": "Languages",
@@ -211,6 +212,20 @@ def resolve(doc, variant, version="dev", private=None):
             "keywords": [_text(k) for k in p.get("keywords", [])],
         }))
 
+    volunteer = [
+        _drop_none({
+            "organization": _text(v["organization"]),
+            "position": _pick(v["position"], variant),
+            "url": v.get("url"),
+            "startDate": v["startDate"],
+            "endDate": v.get("endDate"),
+            "dates": date_range(v["startDate"], v.get("endDate")),
+            "summary": _pick(v["summary"], variant) if v.get("summary") else None,
+            "highlights": _bullets(v.get("highlights"), variant),
+        })
+        for v in doc.get("volunteer", []) if _included(v, variant)
+    ]
+
     education = [
         _drop_none({
             "institution": _text(e["institution"]),
@@ -250,6 +265,7 @@ def resolve(doc, variant, version="dev", private=None):
         "skills": skills,
         "work": work,
         "projects": projects,
+        "volunteer": volunteer,
         "education": education,
         "certificates": certificates,
         "languages": languages,
@@ -261,7 +277,7 @@ def resolve(doc, variant, version="dev", private=None):
 
     verify_count = sum(
         1
-        for entry in work + projects
+        for entry in work + projects + volunteer
         for h in entry.get("highlights", [])
         if h["status"] == "verify"
     )
@@ -278,6 +294,7 @@ def resolve(doc, variant, version="dev", private=None):
         "sections": sections,
         "work": work,
         "projects": projects,
+        "volunteer": volunteer,
         "education": education,
         "certificates": certificates,
         "skills": skills,

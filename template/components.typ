@@ -52,7 +52,8 @@
       items.push(link("mailto:" + b.email, b.email))
       if opt(b, "url") != none { items.push(link(b.url, b.url_display)) }
       for p in b.profiles { items.push(link(p.url, p.display)) }
-      items.join("  |  ")
+      // box() keeps each item on one line, so a URL never breaks in the middle.
+      items.map(box).join("  |  ")
     }
   ]
 }
@@ -106,6 +107,16 @@
     if opt(p, "description") != none { block(below: 0.5em, p.description) }
     bullets(p.highlights)
     if p.keywords.len() > 0 { block(below: 0.6em, emph(p.keywords.join(", "))) }
+    v(0.4em)
+  }
+}
+
+#let volunteer-section(volunteer) = {
+  for item in volunteer {
+    entry-head(strong(item.position), item.dates, left-bottom: item.organization)
+    if opt(item, "summary") != none { block(below: 0.5em, emph(item.summary)) }
+    bullets(item.highlights)
+    v(0.4em)
   }
 }
 
@@ -134,6 +145,7 @@
   else if s.key == "skills" { skills-section(data.skills) }
   else if s.key == "work" { work-section(data.work) }
   else if s.key == "projects" { projects-section(data.projects) }
+  else if s.key == "volunteer" { volunteer-section(data.volunteer) }
   else if s.key == "education" { education-section(data.education) }
   else if s.key == "certificates" { certificates-section(data.certificates) }
   else if s.key == "languages" { languages-section(data.languages) }

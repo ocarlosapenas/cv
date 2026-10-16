@@ -54,5 +54,18 @@ def test_location_keeps_only_jsonresume_fields(doc):
     assert out["basics"]["location"] == {"city": "Springfield", "countryCode": "BR"}
 
 
+def test_volunteer_exported_in_jsonresume_shape(doc):
+    out = to_jsonresume(resolve(doc, "ai"))
+    assert out["volunteer"][0] == {
+        "organization": "Community Group",
+        "position": "Volunteer Engineer",
+        "startDate": "2020-05",
+        "endDate": "2023-07",
+        "highlights": ["Built an e-learning platform for 500+ students."],
+    }
+    assert out["volunteer"][1] == {"organization": "Talk Club", "position": "Conversation Facilitator", "startDate": "2022-11", "endDate": "2025-09"}
+    validate_jsonresume(out)
+
+
 def test_output_is_json_serializable(doc):
     json.dumps(to_jsonresume(resolve(doc, "backend")))

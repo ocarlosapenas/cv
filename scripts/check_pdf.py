@@ -54,7 +54,7 @@ def missing_bullets(model, text):
     haystack = normalize(text)
     return [
         h["text"]
-        for entry in model["work"] + model["projects"]
+        for entry in model["work"] + model["projects"] + model["volunteer"]
         for h in entry.get("highlights", [])
         if normalize(h["text"]) not in haystack
     ]
@@ -97,6 +97,7 @@ def dates_detached(model, text):
     lines = [" ".join(line.split()) for line in text.splitlines()]
     pairs = [(w["position"], w["dates"]) for w in model["work"]]
     pairs += [(p["name"], p["dates"]) for p in model["projects"] if p.get("dates")]
+    pairs += [(v["position"], v["dates"]) for v in model["volunteer"]]
     pairs += [(e["institution"], e["dates"]) for e in model["education"] if e.get("dates")]
     return [f"{label} ({dates})" for label, dates in pairs if not any(label in ln and dates in ln for ln in lines)]
 

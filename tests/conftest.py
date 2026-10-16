@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(ROOT, "scripts"))
 BASE_DOC = {
     "meta": {
         "variants": {
-            "backend": {"sections": ["summary", "skills", "work", "education"], "max_pages": 2},
+            "backend": {"sections": ["summary", "skills", "work", "volunteer", "education"], "max_pages": 2},
             "ai": {"sections": ["summary", "work", "skills", "education"], "max_pages": 2},
         }
     },
@@ -45,6 +45,22 @@ BASE_DOC = {
     "skills": [
         {"name": "Backend", "keywords": ["PHP", "Laravel"]},
         {"name": "AI tooling", "keywords": ["MCP"], "tags": ["ai"]},
+    ],
+    "volunteer": [
+        {
+            "organization": "Community Group",
+            "position": "Volunteer Engineer",
+            "startDate": "2020-05",
+            "endDate": "2023-07",
+            "highlights": ["Built an e-learning platform for 500+ students."],
+        },
+        {
+            "organization": "Talk Club",
+            "position": "Conversation Facilitator",
+            "startDate": "2022-11",
+            "endDate": "2025-09",
+            "tags": ["ai"],
+        },
     ],
     "education": [
         {"institution": "State University", "studyType": "Associate degree", "area": "Systems Analysis", "startDate": "2008", "endDate": "2011"}

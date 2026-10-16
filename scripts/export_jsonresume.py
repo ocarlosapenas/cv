@@ -38,6 +38,11 @@ def to_jsonresume(model):
              **({"highlights": _texts(p["highlights"])} if p["highlights"] else {})}
             for p in model["projects"]
         ],
+        "volunteer": [
+            {**_keep(v, ("organization", "position", "url", "startDate", "endDate", "summary")),
+             **({"highlights": _texts(v["highlights"])} if v["highlights"] else {})}
+            for v in model["volunteer"]
+        ],
         "education": [
             _keep(e, ("institution", "url", "area", "studyType", "startDate", "endDate"))
             for e in model["education"]

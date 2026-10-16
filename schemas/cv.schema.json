@@ -4,30 +4,54 @@
   "title": "cv.yaml",
   "description": "Single source of truth for the CV. JSON Resume section and field names, plus per-variant values, tags and review status. No phone or street address: private contact data lives outside the repository.",
   "type": "object",
-  "required": ["meta", "basics"],
+  "required": [
+    "meta",
+    "basics"
+  ],
   "additionalProperties": false,
   "properties": {
     "meta": {
       "type": "object",
-      "required": ["variants"],
+      "required": [
+        "variants"
+      ],
       "additionalProperties": false,
       "properties": {
         "variants": {
           "type": "object",
           "minProperties": 1,
-          "propertyNames": { "pattern": "^(?!default$)[a-z][a-z0-9-]*$" },
+          "propertyNames": {
+            "pattern": "^(?!default$)[a-z][a-z0-9-]*$"
+          },
           "additionalProperties": {
             "type": "object",
-            "required": ["sections"],
+            "required": [
+              "sections"
+            ],
             "additionalProperties": false,
             "properties": {
               "sections": {
                 "type": "array",
                 "minItems": 1,
                 "uniqueItems": true,
-                "items": { "enum": ["summary", "skills", "work", "projects", "education", "certificates", "languages"] }
+                "items": {
+                  "enum": [
+                    "summary",
+                    "skills",
+                    "work",
+                    "projects",
+                    "volunteer",
+                    "education",
+                    "certificates",
+                    "languages"
+                  ]
+                }
               },
-              "max_pages": { "type": "integer", "minimum": 1, "maximum": 3 }
+              "max_pages": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              }
             }
           }
         }
@@ -35,37 +59,78 @@
     },
     "basics": {
       "type": "object",
-      "required": ["name", "label", "email", "location"],
+      "required": [
+        "name",
+        "label",
+        "email",
+        "location"
+      ],
       "additionalProperties": false,
       "properties": {
-        "name": { "$ref": "#/definitions/text" },
-        "label": { "$ref": "#/definitions/variantText" },
-        "email": { "type": "string", "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" },
-        "url": { "$ref": "#/definitions/url" },
-        "summary": { "$ref": "#/definitions/variantText" },
+        "name": {
+          "$ref": "#/definitions/text"
+        },
+        "label": {
+          "$ref": "#/definitions/variantText"
+        },
+        "email": {
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+        },
+        "url": {
+          "$ref": "#/definitions/url"
+        },
+        "summary": {
+          "$ref": "#/definitions/variantText"
+        },
         "location": {
           "type": "object",
-          "required": ["city", "countryCode"],
+          "required": [
+            "city",
+            "countryCode"
+          ],
           "additionalProperties": false,
           "properties": {
-            "city": { "$ref": "#/definitions/text" },
-            "region": { "$ref": "#/definitions/text" },
-            "countryCode": { "type": "string", "pattern": "^[A-Z]{2}$" },
-            "country": { "$ref": "#/definitions/text" },
-            "remote": { "$ref": "#/definitions/text" },
-            "timezone": { "$ref": "#/definitions/text" }
+            "city": {
+              "$ref": "#/definitions/text"
+            },
+            "region": {
+              "$ref": "#/definitions/text"
+            },
+            "countryCode": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}$"
+            },
+            "country": {
+              "$ref": "#/definitions/text"
+            },
+            "remote": {
+              "$ref": "#/definitions/text"
+            },
+            "timezone": {
+              "$ref": "#/definitions/text"
+            }
           }
         },
         "profiles": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["network", "url"],
+            "required": [
+              "network",
+              "url"
+            ],
             "additionalProperties": false,
             "properties": {
-              "network": { "$ref": "#/definitions/text" },
-              "username": { "$ref": "#/definitions/text" },
-              "url": { "$ref": "#/definitions/url" }
+              "network": {
+                "$ref": "#/definitions/text"
+              },
+              "username": {
+                "$ref": "#/definitions/text"
+              },
+              "url": {
+                "$ref": "#/definitions/url"
+              }
             }
           }
         }
@@ -75,39 +140,146 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "position", "startDate"],
+        "required": [
+          "name",
+          "position",
+          "startDate"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "$ref": "#/definitions/text" },
-          "position": { "$ref": "#/definitions/variantText" },
-          "url": { "$ref": "#/definitions/url" },
-          "location": { "$ref": "#/definitions/text" },
-          "startDate": { "$ref": "#/definitions/date" },
-          "endDate": { "$ref": "#/definitions/date" },
-          "summary": { "$ref": "#/definitions/variantText" },
-          "highlights": { "$ref": "#/definitions/bullets" },
-          "compact": { "type": "boolean" },
-          "tags": { "$ref": "#/definitions/tags" }
+          "name": {
+            "$ref": "#/definitions/text"
+          },
+          "position": {
+            "$ref": "#/definitions/variantText"
+          },
+          "url": {
+            "$ref": "#/definitions/url"
+          },
+          "location": {
+            "$ref": "#/definitions/text"
+          },
+          "startDate": {
+            "$ref": "#/definitions/date"
+          },
+          "endDate": {
+            "$ref": "#/definitions/date"
+          },
+          "summary": {
+            "$ref": "#/definitions/variantText"
+          },
+          "highlights": {
+            "$ref": "#/definitions/bullets"
+          },
+          "compact": {
+            "type": "boolean"
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         },
-        "if": { "properties": { "compact": { "const": true } }, "required": ["compact"] },
-        "then": { "not": { "anyOf": [{ "required": ["highlights"] }, { "required": ["summary"] }] } }
+        "if": {
+          "properties": {
+            "compact": {
+              "const": true
+            }
+          },
+          "required": [
+            "compact"
+          ]
+        },
+        "then": {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "highlights"
+                ]
+              },
+              {
+                "required": [
+                  "summary"
+                ]
+              }
+            ]
+          }
+        }
       }
     },
     "projects": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "$ref": "#/definitions/text" },
-          "description": { "$ref": "#/definitions/variantText" },
-          "url": { "$ref": "#/definitions/url" },
-          "startDate": { "$ref": "#/definitions/date" },
-          "endDate": { "$ref": "#/definitions/date" },
-          "highlights": { "$ref": "#/definitions/bullets" },
-          "keywords": { "type": "array", "items": { "$ref": "#/definitions/text" } },
-          "tags": { "$ref": "#/definitions/tags" }
+          "name": {
+            "$ref": "#/definitions/text"
+          },
+          "description": {
+            "$ref": "#/definitions/variantText"
+          },
+          "url": {
+            "$ref": "#/definitions/url"
+          },
+          "startDate": {
+            "$ref": "#/definitions/date"
+          },
+          "endDate": {
+            "$ref": "#/definitions/date"
+          },
+          "highlights": {
+            "$ref": "#/definitions/bullets"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/text"
+            }
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
+        }
+      }
+    },
+    "volunteer": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "organization",
+          "position",
+          "startDate"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "organization": {
+            "$ref": "#/definitions/text"
+          },
+          "position": {
+            "$ref": "#/definitions/variantText"
+          },
+          "url": {
+            "$ref": "#/definitions/url"
+          },
+          "startDate": {
+            "$ref": "#/definitions/date"
+          },
+          "endDate": {
+            "$ref": "#/definitions/date"
+          },
+          "summary": {
+            "$ref": "#/definitions/variantText"
+          },
+          "highlights": {
+            "$ref": "#/definitions/bullets"
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         }
       }
     },
@@ -115,16 +287,32 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["institution"],
+        "required": [
+          "institution"
+        ],
         "additionalProperties": false,
         "properties": {
-          "institution": { "$ref": "#/definitions/text" },
-          "area": { "$ref": "#/definitions/text" },
-          "studyType": { "$ref": "#/definitions/text" },
-          "url": { "$ref": "#/definitions/url" },
-          "startDate": { "$ref": "#/definitions/date" },
-          "endDate": { "$ref": "#/definitions/date" },
-          "tags": { "$ref": "#/definitions/tags" }
+          "institution": {
+            "$ref": "#/definitions/text"
+          },
+          "area": {
+            "$ref": "#/definitions/text"
+          },
+          "studyType": {
+            "$ref": "#/definitions/text"
+          },
+          "url": {
+            "$ref": "#/definitions/url"
+          },
+          "startDate": {
+            "$ref": "#/definitions/date"
+          },
+          "endDate": {
+            "$ref": "#/definitions/date"
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         }
       }
     },
@@ -132,14 +320,26 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "$ref": "#/definitions/text" },
-          "issuer": { "$ref": "#/definitions/text" },
-          "date": { "$ref": "#/definitions/date" },
-          "url": { "$ref": "#/definitions/url" },
-          "tags": { "$ref": "#/definitions/tags" }
+          "name": {
+            "$ref": "#/definitions/text"
+          },
+          "issuer": {
+            "$ref": "#/definitions/text"
+          },
+          "date": {
+            "$ref": "#/definitions/date"
+          },
+          "url": {
+            "$ref": "#/definitions/url"
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         }
       }
     },
@@ -147,12 +347,25 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "keywords"],
+        "required": [
+          "name",
+          "keywords"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "$ref": "#/definitions/text" },
-          "keywords": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/text" } },
-          "tags": { "$ref": "#/definitions/tags" }
+          "name": {
+            "$ref": "#/definitions/text"
+          },
+          "keywords": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/definitions/text"
+            }
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         }
       }
     },
@@ -160,49 +373,87 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["language", "fluency"],
+        "required": [
+          "language",
+          "fluency"
+        ],
         "additionalProperties": false,
         "properties": {
-          "language": { "$ref": "#/definitions/text" },
-          "fluency": { "$ref": "#/definitions/text" },
-          "tags": { "$ref": "#/definitions/tags" }
+          "language": {
+            "$ref": "#/definitions/text"
+          },
+          "fluency": {
+            "$ref": "#/definitions/text"
+          },
+          "tags": {
+            "$ref": "#/definitions/tags"
+          }
         }
       }
     }
   },
   "definitions": {
-    "text": { "type": "string", "minLength": 1 },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
     "variantText": {
       "oneOf": [
-        { "$ref": "#/definitions/text" },
+        {
+          "$ref": "#/definitions/text"
+        },
         {
           "type": "object",
-          "required": ["default"],
-          "additionalProperties": { "$ref": "#/definitions/text" }
+          "required": [
+            "default"
+          ],
+          "additionalProperties": {
+            "$ref": "#/definitions/text"
+          }
         }
       ]
     },
-    "url": { "type": "string", "pattern": "^https?://\\S+$" },
-    "date": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$" },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://\\S+$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$"
+    },
     "tags": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "bullets": {
       "type": "array",
       "items": {
         "oneOf": [
-          { "$ref": "#/definitions/text" },
+          {
+            "$ref": "#/definitions/text"
+          },
           {
             "type": "object",
-            "required": ["text"],
+            "required": [
+              "text"
+            ],
             "additionalProperties": false,
             "properties": {
-              "text": { "$ref": "#/definitions/text" },
-              "tags": { "$ref": "#/definitions/tags" },
-              "status": { "enum": ["verify"] }
+              "text": {
+                "$ref": "#/definitions/text"
+              },
+              "tags": {
+                "$ref": "#/definitions/tags"
+              },
+              "status": {
+                "enum": [
+                  "verify"
+                ]
+              }
             }
           }
         ]

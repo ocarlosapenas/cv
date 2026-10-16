@@ -35,6 +35,11 @@ def good_text(model):
                 lines.append(f"{w['position']} {w['dates']}")
                 lines.append(w["name"])
                 lines += ["• " + h["text"] for h in w["highlights"]]
+        if section["key"] == "volunteer":
+            for v in model["volunteer"]:
+                lines.append(f"{v['position']} {v['dates']}")
+                lines.append(v["organization"])
+                lines += ["• " + h["text"] for h in v["highlights"]]
         if section["key"] == "skills":
             lines += [f"{s['name']}: " + ", ".join(s["keywords"]) for s in model["skills"]]
         if section["key"] == "education":
@@ -115,6 +120,16 @@ def test_dates_detached_detected(doc):
     text = good_text(model).replace("Senior Software Engineer Jul 2023 – Present", "Senior Software Engineer")
     text += "Jul 2023 – Present\n"
     assert dates_detached(model, text) == ["Senior Software Engineer (Jul 2023 – Present)"]
+
+
+def test_volunteer_bullets_and_dates_checked(doc):
+    model = resolve(doc, "backend")
+    text = good_text(model)
+    assert missing_bullets(model, text.replace("e-learning platform", "learning site")) == [
+        "Built an e-learning platform for 500+ students."
+    ]
+    detached = text.replace("Volunteer Engineer May 2020 – Jul 2023", "Volunteer Engineer") + "May 2020 – Jul 2023\n"
+    assert dates_detached(model, detached) == ["Volunteer Engineer (May 2020 – Jul 2023)"]
 
 
 def test_pdf_ua_declared():
