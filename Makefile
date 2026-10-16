@@ -8,7 +8,14 @@ TYPST_FLAGS := --root . --ignore-system-fonts --pdf-standard ua-1
 DENYLIST := private/denylist.local
 PRIVATE := private/contact.private.yaml
 
-.PHONY: build test check private clean
+TODAY ?= $(shell date +%Y-%m)
+# Private self-reported sources (never committed): LinkedIn screening answers and old
+# platform profiles. When present, `make skills` compares them with the evidence.
+SCREENING := $(wildcard private/linkedin/*/screening-*.csv)
+SELF_REPORTED := $(wildcard private/drafts/*-skills-*.yaml)
+SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yaml),--config private/skills-private.yaml)
+
+.PHONY: build test check private clean skills match
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -47,6 +54,17 @@ private:
 	  || exit 1; \
 	  echo "built build/private/$$v"; \
 	done
+
+## skills: years per skill computed from the evidence in cv.yaml -> build/skills.{json,md}
+skills:
+	$(RUN) python3 scripts/skills.py cv.yaml $(SKILLS_CONFIG) --today $(TODAY) \
+	  --json build/skills.json --md build/skills.md \
+	  $(foreach f,$(SCREENING),--claims-csv $(f)) $(foreach f,$(SELF_REPORTED),--self-reported $(f))
+
+## match: compare a job description with the evidence (JOB=private/jobs/<file>.txt)
+match: skills
+	@test -n "$(JOB)" || { echo "usage: make match JOB=private/jobs/<file>.txt"; exit 1; }
+	$(RUN) python3 scripts/match_job.py --report build/skills.json $(SKILLS_CONFIG) $(JOB)
 
 clean:
 	rm -rf build

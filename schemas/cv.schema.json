@@ -176,6 +176,9 @@
           },
           "tags": {
             "$ref": "#/definitions/tags"
+          },
+          "stack": {
+            "$ref": "#/definitions/stack"
           }
         },
         "if": {
@@ -241,6 +244,9 @@
           },
           "tags": {
             "$ref": "#/definitions/tags"
+          },
+          "stack": {
+            "$ref": "#/definitions/stack"
           }
         }
       }
@@ -279,6 +285,9 @@
           },
           "tags": {
             "$ref": "#/definitions/tags"
+          },
+          "stack": {
+            "$ref": "#/definitions/stack"
           }
         }
       }
@@ -453,6 +462,42 @@
                 "enum": [
                   "verify"
                 ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "stack": {
+      "description": "Technologies used in this entry, as evidence for the skill tracking (scripts/skills.py). Not rendered in the PDF.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/text"
+          },
+          {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/text"
+              },
+              "startDate": {
+                "$ref": "#/definitions/date"
+              },
+              "endDate": {
+                "$ref": "#/definitions/date"
+              },
+              "years": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "note": {
+                "$ref": "#/definitions/text"
               }
             }
           }

@@ -1,0 +1,108 @@
+# Skill tracking configuration, read by `make skills` and `make match`.
+#
+# Years of experience are NOT typed here: scripts/skills.py computes them from the
+# `stack` of each entry in cv.yaml. This file only says how names map to each other,
+# which extra terms to look for in job posts, and which totals the owner confirmed.
+
+# Canonical name -> other names used in job posts and application questions.
+aliases:
+  REST APIs: [REST API, RESTful API, RESTful APIs, API, APIs, API Development, Web APIs]
+  OpenAPI/Swagger: [OpenAPI, Swagger]
+  Laravel: [Laravel Framework]
+  PostgreSQL: [Postgres]
+  MongoDB: [Mongo, NoSQL]
+  Redis: [Valkey, Redis/Valkey]
+  SQL: [Databases, Banco de dados, Relational databases]
+  JavaScript: [JS]
+  Vue.js: [Vue, VueJS]
+  HTML: [HTML5]
+  CSS: [CSS3, Cascading Style Sheets (CSS)]
+  Bootstrap: [Bootstrap (Framework)]
+  AWS: [Amazon Web Services, Amazon Web Services (AWS)]
+  AWS EC2: [EC2, Amazon EC2]
+  AWS RDS: [RDS, Amazon RDS]
+  AWS S3: [S3, Amazon S3]
+  AWS SQS: [SQS, Amazon SQS]
+  AWS SNS: [SNS, Amazon SNS]
+  AWS Lambda: [Lambda]
+  AWS ElastiCache: [ElastiCache, Amazon ElastiCache]
+  Google Cloud: [GCP, Google Cloud Platform]
+  DigitalOcean: [Digital Ocean]
+  Docker: [Docker Products, Docker Compose]
+  Bash: [Shell, Shell scripting, Shell Script, Bash scripting]
+  CI/CD: [Continuous Integration, Continuous Delivery]
+  PHPUnit: [Unit Testing, Unit tests, Test Automation]
+  Scrum: [Agile]
+  Python: [Python (Programming Language)]
+  MCP: [Model Context Protocol]
+  Electron: [Electron (nodejs)]
+  Apache: [Apache HTTP Server, LAMP]
+  MVC: [Model-View-Controller (MVC), Model View Controller]
+  Software Development: [Programming, Back-End Web Development, Backend Development, Web Development, IT experience]
+
+# Terms to detect in job posts even without evidence, so `make match` can list gaps.
+vocabulary:
+  - Kubernetes
+  - Terraform
+  - Helm
+  - Java
+  - Spring Framework
+  - Go
+  - Golang
+  - TypeScript
+  - Node.js
+  - NestJS
+  - React
+  - React.js
+  - Angular
+  - Ruby
+  - C#
+  - .NET
+  - C++
+  - Rust
+  - Kafka
+  - RabbitMQ
+  - GraphQL
+  - gRPC
+  - Elasticsearch
+  - DynamoDB
+  - Oracle Database
+  - WordPress
+  - Nginx
+  - Datadog
+  - Prometheus
+  - Grafana
+  - OpenTelemetry
+  - Sentry
+  - LLM
+  - RAG
+  - evals
+  - embeddings
+  - fine-tuning
+  - LangChain
+  - PyTorch
+  - Machine Learning
+
+# Owner-confirmed totals ({years: N, as_of: YYYY-MM}) take precedence over the computed
+# evidence when answering application questions. They are personal application data, so
+# they live in the private overlay private/skills-private.yaml (gitignored), together
+# with evidence from side projects. This public file keeps none.
+confirmed: {}
+
+# Evidence that is not on the CV itself.
+evidence:
+  - where: Career as a software developer (all roles on the CV)
+    startDate: "2011-03"
+    stack: [Software Development]
+  - where: Revenda Mais 2013 (not on the CV)
+    startDate: "2013-01"
+    endDate: "2013-10"
+    stack: [PHP]
+  - where: This repository (CV as code)
+    startDate: "2026-10"
+    stack:
+      - name: Python
+        note: Scripts and tests written by a coding agent under the owner's direction.
+      - Typst
+      - Docker
+      - pytest
