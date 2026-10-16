@@ -22,6 +22,8 @@ PHONE_CANDIDATE = re.compile(r"\+?\(?\d[\d\s().-]{6,}\d")
 # "1.3.1 (2026-07-22)" or "2025-11-03 to 2026-04-15" do not add up to ten digits. The
 # real phone is still caught exactly by the private-value check.
 ISO_DATE = re.compile(r"\b(?:19|20)\d{2}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?\b")
+# URLs are removed too: IDs inside links (certificate UUIDs) are not phone numbers.
+URL = re.compile(r"https?://\S+")
 
 
 @dataclass(frozen=True)
@@ -62,7 +64,7 @@ def scan(entries, name, text):
 def phone_like(text):
     hits = []
     for lineno, line in enumerate(text.splitlines(), 1):
-        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", line)):
+        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", URL.sub(" ", line))):
             if len(re.sub(r"\D", "", match.group())) >= 10:
                 hits.append(lineno)
                 break

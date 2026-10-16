@@ -46,6 +46,15 @@ def test_phone_like_ignores_versions_next_to_iso_dates():
     assert phone_like(text) == [4]
 
 
+def test_phone_like_ignores_digits_inside_urls():
+    text = "\n".join([
+        "url: https://app.block.co/certificate/0506953b-e288-4546-8887-913e3c52603c/",
+        "see https://example.com/call/+55-42-99999-9999 for details",
+        "Call +55 42 99999-9999",
+    ])
+    assert phone_like(text) == [3]
+
+
 def test_private_values_reported_by_key():
     private = {"phone": "+1 555 010 0000", "email": "alex.private@example.com"}
     assert private_values_found(private, "contact alex.private@example.com") == ["email"]
