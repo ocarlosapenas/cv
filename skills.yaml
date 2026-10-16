@@ -26,16 +26,18 @@ aliases:
   AWS SNS: [SNS, Amazon SNS]
   AWS Lambda: [Lambda]
   AWS ElastiCache: [ElastiCache, Amazon ElastiCache]
-  Google Cloud: [GCP, Google Cloud Platform]
+  Google Cloud: [GCP, Google Cloud Platform, Google Cloud Platform (GCP)]
   DigitalOcean: [Digital Ocean]
   Docker: [Docker Products, Docker Compose]
   Bash: [Shell, Shell scripting, Shell Script, Bash scripting]
-  CI/CD: [Continuous Integration, Continuous Delivery]
+  CI/CD: [Continuous Integration, Continuous Delivery, Continuous Integration and Continuous Delivery (CI/CD)]
   PHPUnit: [Unit Testing, Unit tests, Test Automation]
   Scrum: [Agile]
   Python: [Python (Programming Language)]
   MCP: [Model Context Protocol]
   Electron: [Electron (nodejs)]
+  OAuth2: [OAuth, OAuth 2.0]
+  Git: [GIT]
   Apache: [Apache HTTP Server, LAMP]
   MVC: [Model-View-Controller (MVC), Model View Controller]
   Software Development: [Programming, Back-End Web Development, Backend Development, Web Development, IT experience]
@@ -106,3 +108,54 @@ evidence:
       - Typst
       - Docker
       - pytest
+
+# Skills to show on LinkedIn, in display order (LinkedIn's own names where they exist).
+# Names only: no years. `make linkedin` compares this list with the current profile.
+linkedin_skills:
+  - PHP
+  - Laravel
+  - Amazon Web Services (AWS)
+  - Linux
+  - Docker
+  - MySQL
+  - MariaDB
+  - Redis
+  - REST APIs
+  - GitHub Actions
+  - Continuous Integration and Continuous Delivery (CI/CD)
+  - Bash
+  - Root Cause Analysis
+  - Release Engineering
+  - Infrastructure as Code (IaC)
+  - OpenTofu
+  - Ansible
+  - AWS Lambda
+  - Amazon RDS
+  - Amazon EC2
+  - Amazon S3
+  - Amazon SQS
+  - Cloudflare
+  - Nginx
+  - Test-Driven Development
+  - PHPUnit
+  - Mutation Testing
+  - PHPStan
+  - Lumen
+  - Vue.js
+  - JavaScript
+  - PostgreSQL
+  - MongoDB
+  - Stripe
+  - OAuth
+  - Python (Programming Language)
+  - Claude Code
+  - Model Context Protocol (MCP)
+  - Git
+  - GitHub
+  - Google Cloud Platform (GCP)
+  - DigitalOcean
+  - Code Review
+  - Mentoring
+  - Scrum
+  - Leadership
+  - Public Speaking

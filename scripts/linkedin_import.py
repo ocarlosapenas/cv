@@ -140,6 +140,8 @@ def import_export(folder):
                 seen.add(row["Name"].casefold())
                 keywords.append(row["Name"])
         draft["skills"] = [{"name": "LinkedIn", "keywords": keywords}]
+        # As listed on LinkedIn, duplicates included, so the update checklist can flag them.
+        draft["skills_raw"] = [row["Name"] for row in skills if row["Name"]]
 
     return draft
 

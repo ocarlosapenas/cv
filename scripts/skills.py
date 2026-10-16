@@ -44,6 +44,7 @@ def load_config(data):
         "vocabulary": list(data.get("vocabulary") or []),
         "confirmed": dict(data.get("confirmed") or {}),
         "evidence": list(data.get("evidence") or []),
+        "linkedin_skills": list(data.get("linkedin_skills") or []),
     }
 
 
@@ -61,6 +62,7 @@ def merge_configs(*configs):
         merged["vocabulary"] += [t for t in config["vocabulary"] if t not in merged["vocabulary"]]
         merged["confirmed"].update(config["confirmed"])
         merged["evidence"] += config["evidence"]
+        merged["linkedin_skills"] = config["linkedin_skills"] or merged["linkedin_skills"]
     return merged
 
 

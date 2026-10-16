@@ -15,7 +15,10 @@ SCREENING := $(wildcard private/linkedin/*/screening-*.csv)
 SELF_REPORTED := $(wildcard private/drafts/*-skills-*.yaml)
 SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yaml),--config private/skills-private.yaml)
 
-.PHONY: build test check private clean skills match
+# Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
+LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
+
+.PHONY: build test check private clean skills match linkedin
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -65,6 +68,13 @@ skills:
 match: skills
 	@test -n "$(JOB)" || { echo "usage: make match JOB=private/jobs/<file>.txt"; exit 1; }
 	$(RUN) python3 scripts/match_job.py --report build/skills.json $(SKILLS_CONFIG) $(JOB)
+
+## linkedin: paste-ready LinkedIn texts with limit checks (+ checklist if an export exists)
+linkedin:
+	$(RUN) python3 scripts/resolve.py cv.yaml --variant linkedin --out build/linkedin/resolved.json
+	$(if $(LINKEDIN_EXPORT),$(RUN) python3 scripts/linkedin_import.py $(dir $(LINKEDIN_EXPORT)) --out build/linkedin/current.yaml)
+	$(RUN) python3 scripts/linkedin_texts.py build/linkedin/resolved.json $(SKILLS_CONFIG) \
+	  $(if $(LINKEDIN_EXPORT),--current build/linkedin/current.yaml) --out build/linkedin
 
 clean:
 	rm -rf build

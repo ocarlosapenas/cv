@@ -61,6 +61,10 @@ def test_import_skills_deduplicated_case_insensitively():
     assert import_export(FIXTURE)["skills"] == [{"name": "LinkedIn", "keywords": ["Laravel", "PHP", "Git"]}]
 
 
+def test_import_keeps_raw_skill_list_with_duplicates():
+    assert import_export(FIXTURE)["skills_raw"] == ["Laravel", "PHP", "laravel", "Git", "git"]
+
+
 def test_import_education_certificates_volunteer():
     draft = import_export(FIXTURE)
     assert draft["education"] == [{"institution": "Federal Technical University", "studyType": "Technologist", "startDate": "2008", "endDate": "2011"}]
