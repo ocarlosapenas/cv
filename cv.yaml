@@ -59,8 +59,9 @@ basics:
     fde: >-
       Backend engineer with 15 years shipping and running production systems. Owns backend
       services, AWS infrastructure, releases and incident response for a U.S. adtech platform
-      serving 20M+ pageviews per day. Fluent in English and used to working remotely with
-      U.S. teams.
+      serving 20M+ pageviews per day. Has delivered software for adtech, education,
+      marketing, automotive retail, e-commerce, financial services and government. Fluent
+      in English and used to working remotely with U.S. teams.
 
 work:
   - name: AdMetricsPro
@@ -73,6 +74,45 @@ work:
       Backend services, AWS infrastructure and releases for a U.S. programmatic advertising
       platform. Contractor through Proxify from Jul 2023; hired directly as a full-time
       employee in Jun 2024.
+    stack:
+      - PHP
+      - Laravel
+      - Lumen
+      - REST APIs
+      - MySQL
+      - MariaDB
+      - SQL
+      - Redis
+      - AWS
+      - AWS EC2
+      - AWS RDS
+      - AWS S3
+      - AWS SQS
+      - AWS SNS
+      - AWS Lambda
+      - AWS ElastiCache
+      - Linux
+      - Bash
+      - Docker
+      - Git
+      - GitHub Actions
+      - CI/CD
+      - Cloudflare
+      - Vue.js
+      - JavaScript
+      - HTML
+      - CSS
+      - PHPUnit
+      - {name: OAuth2, startDate: "2026-08", note: Laravel Passport upgrade is the first evidence}
+      - {name: Stripe, startDate: "2026-06", note: first evidence in session notes}
+      - {name: Infection, startDate: "2026-06"}
+      - {name: PHPMD, startDate: "2026-06"}
+      - {name: Deptrac, startDate: "2026-06"}
+      - {name: PHPStan, startDate: "2026-08"}
+      - {name: Renovate, startDate: "2026-09"}
+      - {name: Claude Code, startDate: "2026-05", note: first evidence in session notes}
+      - {name: MCP, startDate: "2026-05", note: first evidence in session notes}
+      - {name: Cursor, startDate: "2026-10", note: first evidence in the 2026-10-15 CV}
     highlights:
       - Led the move from a VPS to AWS (EC2, RDS, ALB, ACM), including a 250 GB MariaDB migration with under 2 hours of downtime.
       - Build and operate PHP/Laravel APIs and queue-driven ingestion services on AWS that handle 20M+ pageviews per day.
@@ -103,6 +143,7 @@ work:
     startDate: "2022-03"
     endDate: "2023-05"
     summary: SaaS for car dealership management.
+    stack: [PHP, Yii, Laravel, MySQL, PostgreSQL, SQL, MongoDB, JavaScript, Vue.js, HTML, CSS, Docker, AWS, AWS EC2, AWS S3, AWS SQS, AWS Lambda, REST APIs, OpenAPI/Swagger, PHPUnit, Git, Jira, Scrum, Postman]
     highlights:
       - Main engineer on the rebuild of the core product, from a legacy Yii 1.1 monolith to a Laravel REST API and a Vue.js frontend, with unit and feature tests.
       - text: Cut image-processing servers from 6 to 2 with an AWS Lambda proof of concept, lowering infrastructure cost by about 30%.
@@ -113,6 +154,7 @@ work:
     startDate: "2019-10"
     endDate: "2022-03"
     summary: Platform where the franchisees of an advertising network create and manage marketing media.
+    stack: [PHP, Laravel, MySQL, SQL, JavaScript, HTML, CSS, Bootstrap, Docker, CI/CD, Bash, DigitalOcean, OAuth2, Git, Jira, Scrum, Postman]
     highlights:
       - Led the team's adoption of Docker, CI/CD and code review.
       - Integrated payment methods and recurring subscriptions, and built tools that generate marketing artwork as PDF.
@@ -123,6 +165,25 @@ work:
     startDate: "2013-11"
     endDate: "2022-01"
     summary: In-house software for a Brazilian state police force.
+    stack:
+      - PHP
+      - Laravel
+      - MySQL
+      - SQL
+      - JavaScript
+      - HTML
+      - CSS
+      - Linux
+      - Bash
+      - Apache
+      - Git
+      - Selenium
+      - SQLMap
+      - {name: Vue.js, startDate: "2020-07", note: first commit of the Luure repository}
+      - {name: jQuery, startDate: "2020-07", note: first commit of the Luure repository}
+      - {name: Bootstrap, startDate: "2020-07", note: first commit of the Luure repository}
+      - {name: Python, years: 1, note: Proxify profile says 1 year; when inside this period is unknown}
+      - {name: Electron, years: 1, note: Proxify profile says 1 year; when inside this period is unknown}
     highlights:
       - Designed and built Luure from scratch, a Laravel and MySQL system that tracks operations, deadlines and statistics, covering architecture, servers, backend and frontend.
       - Ran authorized penetration tests with SQLMap on internal applications and reported the vulnerabilities found; they were fixed and the work was commended.
@@ -133,6 +194,7 @@ work:
     startDate: "2019-07"
     endDate: "2020-09"
     summary: Decision-support tools for the branches of a credit union network.
+    stack: [PHP, Laravel, CodeIgniter, MySQL, SQL, JavaScript, jQuery, HTML, CSS, Google Cloud, Selenium, REST APIs, Git]
     highlights:
       - text: Migrated 100+ databases to Google Cloud and introduced Git for version control.
     tags: [backend, fde]
@@ -141,6 +203,7 @@ work:
     position: Freelance PHP Developer
     startDate: "2018-01"
     endDate: "2019-07"
+    stack: [PHP, Laravel, Git]
     compact: true
     tags: [backend]
 
@@ -148,6 +211,7 @@ work:
     position: Freelance PHP Developer
     startDate: "2013-11"
     endDate: "2018-01"
+    stack: [PHP, Joomla]
     compact: true
     tags: [backend]
 
@@ -155,6 +219,7 @@ work:
     position: PHP Developer
     startDate: "2011-03"
     endDate: "2013-01"
+    stack: [PHP]
     compact: true
 
 projects:
@@ -165,6 +230,7 @@ projects:
       - text: Rebuilt it with OpenTofu and Ansible (10 roles), then destroyed and recreated production from code to prove recovery.
       - CI with fmt and validate, tflint, ansible-lint, gitleaks and zizmor; Renovate updates; offsite backups with failure alerts and a dead man's switch.
     keywords: [OpenTofu, Ansible, Proxmox, GitHub Actions]
+    stack: [Linux, Bash, Cloudflare, Renovate]
     tags: [backend, fde]
   - name: QuietRadar
     description: SaaS that monitors adblock filter lists.
@@ -176,6 +242,7 @@ volunteer:
     position: Volunteer Senior Software Engineer
     startDate: "2020-05"
     endDate: "2023-07"
+    stack: [PHP, Laravel, Vue.js, JavaScript, HTML, CSS, Docker, DigitalOcean, Git]
     highlights:
       - text: Designed and built from scratch a Laravel and Vue.js e-learning platform for 500+ active students on Docker and DigitalOcean, and led the volunteers who maintained it.
   - organization: TALKNTALK
@@ -188,23 +255,30 @@ volunteer:
 
 skills:
   - name: Backend
-    keywords: ["PHP 8", "Laravel", "Lumen", "REST APIs", "queues and async jobs", "Stripe"]
+    keywords: ["PHP 8", "Laravel", "Lumen", "REST APIs", "OpenAPI/Swagger", "OAuth2", "queues and async jobs", "Stripe", "Python (scripting and tooling)"]
   - name: Cloud and operations
     keywords:
       - "AWS (EC2, RDS, ALB, ACM, ElastiCache, Lambda, S3, SQS, SNS)"
+      - "Google Cloud"
+      - "DigitalOcean"
       - "Linux (Debian, Amazon Linux)"
+      - "Bash and shell scripting"
+      - "Nginx"
+      - "Apache"
       - "Docker"
       - "Cloudflare"
   - name: IaC and CI/CD
     keywords: ["GitHub Actions", "OpenTofu", "Ansible", "Renovate", "release automation", "automated rollback"]
   - name: Data
-    keywords: ["MySQL", "MariaDB", "Redis/Valkey", "MongoDB"]
+    keywords: ["MySQL", "MariaDB", "PostgreSQL", "Redis/Valkey", "MongoDB"]
   - name: Quality and reliability
     keywords: ["PHPUnit", "TDD", "mutation testing (Infection)", "PHPStan", "root cause analysis", "postmortems"]
   - name: Agentic engineering
     keywords: ["Claude Code (custom skills, MCP, multi-agent workflows)", "Cursor", "verification loops"]
   - name: Frontend
     keywords: ["Vue.js", "JavaScript"]
+  - name: Collaboration
+    keywords: ["Scrum", "code review", "mentoring"]
 
 education:
   - institution: Federal University of Technology – Paraná (UTFPR)
