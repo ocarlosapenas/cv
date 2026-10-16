@@ -99,7 +99,12 @@ def _check_variant_names(node, path, variants, problems):
 
 
 def _text(value):
-    return " ".join(value.split()) if isinstance(value, str) else value
+    # Collapse whitespace inside each paragraph; keep blank-line paragraph breaks (the
+    # LinkedIn About is several paragraphs, every PDF field is one).
+    if not isinstance(value, str):
+        return value
+    paragraphs = re.split(r"\n\s*\n", value.strip())
+    return "\n\n".join(" ".join(p.split()) for p in paragraphs if p.strip())
 
 
 def _pick(value, variant):

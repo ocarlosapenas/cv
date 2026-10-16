@@ -131,6 +131,11 @@ def test_text_whitespace_collapsed(doc):
     assert resolve(doc, "backend")["basics"]["summary"] == "Line one line two."
 
 
+def test_paragraph_breaks_are_kept(doc):
+    doc["basics"]["summary"] = "First paragraph\nstill first.\n\n  Second   paragraph.\n"
+    assert resolve(doc, "backend")["basics"]["summary"] == "First paragraph still first.\n\nSecond paragraph."
+
+
 def test_private_merge_only_when_given(doc):
     assert "phone" not in resolve(doc, "backend")["basics"]
     model = resolve(doc, "backend", private={"phone": "+1 555 010 0000", "email": "alex.private@example.com"})
