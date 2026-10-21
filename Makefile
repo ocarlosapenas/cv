@@ -7,6 +7,10 @@ RUN := tools/run
 TYPST_FLAGS := --root . --ignore-system-fonts --pdf-standard ua-1
 DENYLIST := private/denylist.local
 PRIVATE := private/contact.private.yaml
+# In CI (GitHub sets CI=true) the deny-list comes from a secret and must be present.
+DENYLIST_FLAGS := $(if $(CI),--require-denylist)
+# Variants published in each release (constant name + dated copy).
+RELEASE_VARIANTS ?= backend ai fde
 
 TODAY ?= $(shell date +%Y-%m)
 # Private self-reported sources (never committed): LinkedIn screening answers and old
@@ -18,7 +22,7 @@ SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yam
 # Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
 LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
 
-.PHONY: build test check private clean skills match linkedin
+.PHONY: build test check private clean skills match linkedin release-gate release-assets
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -39,11 +43,21 @@ check: test build
 	@for v in $(VARIANTS); do \
 	  $(RUN) pdftotext -q -enc UTF-8 build/$$v/cv.pdf build/$$v/cv.txt \
 	  && $(RUN) python3 scripts/check_pdf.py build/$$v/resolved.json build/$$v/cv.pdf \
-	  && $(RUN) python3 scripts/check_denylist.py --public --denylist $(DENYLIST) --private $(PRIVATE) \
+	  && $(RUN) python3 scripts/check_denylist.py --public $(DENYLIST_FLAGS) --denylist $(DENYLIST) --private $(PRIVATE) \
 	       cv.yaml build/$$v/resolved.json build/$$v/resume.json build/$$v/cv.txt \
 	  || exit 1; \
 	done
 	@echo "check: all variants passed"
+
+## release-gate: fail if VERSION is not CalVer or any claim in cv.yaml is pending verification
+release-gate:
+	$(RUN) python3 scripts/release_gate.py cv.yaml --version $(VERSION)
+
+## release-assets: copy the built PDFs to build/release/ under their release names, then verify them
+release-assets:
+	rm -rf build/release
+	$(RUN) python3 scripts/release_assets.py --copy build --out build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
+	$(RUN) python3 scripts/release_assets.py --verify build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
 
 ## private: build PDFs with private contact data into build/private/ (never published)
 private:
