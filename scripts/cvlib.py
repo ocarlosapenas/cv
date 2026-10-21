@@ -62,6 +62,28 @@ def format_path(parts):
     return out or "(root)"
 
 
+def pending_verify(doc):
+    """Locations of every mapping with `status: verify`, in any variant or none.
+
+    The release gate uses this instead of meta.verify_count, which only counts the
+    bullets of one variant (a LinkedIn-only claim would otherwise slip through).
+    """
+    found = []
+
+    def walk(node, path):
+        if isinstance(node, dict):
+            if node.get("status") == "verify":
+                found.append(format_path(path))
+            for key, value in node.items():
+                walk(value, path + [key])
+        elif isinstance(node, list):
+            for i, value in enumerate(node):
+                walk(value, path + [i])
+
+    walk(doc, [])
+    return found
+
+
 def validate_cv(doc, schema_path=DEFAULT_SCHEMA):
     with open(schema_path, encoding="utf-8") as fh:
         schema = json.load(fh)

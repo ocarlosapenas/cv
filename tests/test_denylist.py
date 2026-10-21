@@ -1,4 +1,4 @@
-from check_denylist import load_denylist, phone_like, private_values_found, scan
+from check_denylist import load_denylist, main, phone_like, private_values_found, scan
 
 DENYLIST = """# confidential terms, one per line
 Project Nebula
@@ -60,3 +60,38 @@ def test_private_values_reported_by_key():
     assert private_values_found(private, "contact alex.private@example.com") == ["email"]
     assert private_values_found(private, "tel 1-555-010-0000") == ["phone"]
     assert private_values_found(private, "nothing here 2013 2022") == []
+
+
+def test_calver_version_is_not_a_phone():
+    # The release version printed in the PDF footer (YYYY.MM.DD-NN) has ten digits.
+    assert phone_like("Carlos Apenas · 2026.10.21-01") == []
+    assert phone_like("2026.10.21-01 +55 42 99999-9999") == [1]
+
+
+def test_require_denylist_fails_when_missing(tmp_path, capsys):
+    target = tmp_path / "cv.txt"
+    target.write_text("Project Nebula shipped\n")
+    code = main(["--require-denylist", "--denylist", str(tmp_path / "absent.local"), str(target)])
+    out = capsys.readouterr()
+    assert code == 1
+    assert "deny-list required but missing or empty" in out.err
+
+
+def test_require_denylist_fails_when_empty(tmp_path, capsys):
+    denylist = tmp_path / "denylist.local"
+    denylist.write_text("# only comments\n\n")
+    target = tmp_path / "cv.txt"
+    target.write_text("Project Nebula shipped\n")
+    code = main(["--require-denylist", "--denylist", str(denylist), str(target)])
+    out = capsys.readouterr()
+    assert code == 1
+    assert "deny-list required but missing or empty" in out.err
+    assert "nebula" not in (out.out + out.err).lower()
+
+
+def test_require_denylist_passes_with_entries(tmp_path):
+    denylist = tmp_path / "denylist.local"
+    denylist.write_text(DENYLIST)
+    target = tmp_path / "cv.txt"
+    target.write_text("nothing confidential\n")
+    assert main(["--require-denylist", "--denylist", str(denylist), str(target)]) == 0

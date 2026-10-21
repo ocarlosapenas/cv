@@ -176,3 +176,18 @@ def test_meta_title_and_version(doc):
     assert meta["title"] == "Alex Example Resume"
     assert meta["version"] == "2026.10.14-01"
     assert meta["max_pages"] == 2
+
+
+def test_pending_verify_finds_entries_outside_pdf_variants(doc):
+    from cvlib import pending_verify
+
+    assert pending_verify(doc) == ["work[0].highlights[1]"]
+    doc["work"][0]["highlights"] = [{"text": "Profile-only claim.", "tags": ["linkedin"], "status": "verify"}]
+    assert pending_verify(doc) == ["work[0].highlights[0]"]
+
+
+def test_pending_verify_empty_when_all_confirmed(doc):
+    from cvlib import pending_verify
+
+    doc["work"][0]["highlights"][1].pop("status")
+    assert pending_verify(doc) == []

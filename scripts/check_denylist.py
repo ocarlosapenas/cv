@@ -1,12 +1,14 @@
 """Confidentiality checks over source and build files.
 
-Usage: check_denylist.py [--public] [--denylist FILE] [--private FILE] FILE...
+Usage: check_denylist.py [--public] [--require-denylist] [--denylist FILE] [--private FILE] FILE...
 
 - Deny-list: one confidential term per line (`#` comments; `re:` prefix = regex).
   A match is reported by deny-list line number and file location, NEVER by the term,
   so the output is safe to show in CI logs.
 - --public: also fail on phone-number-like text and on any value from the private
   contact file. Used for every build that may be published.
+- --require-denylist: fail when the deny-list is missing or has no entries, instead of
+  skipping the check. The Makefile sets it in CI, where the list comes from a secret.
 """
 
 import argparse
@@ -24,6 +26,8 @@ PHONE_CANDIDATE = re.compile(r"\+?\(?\d[\d\s().-]{6,}\d")
 ISO_DATE = re.compile(r"\b(?:19|20)\d{2}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?\b")
 # URLs are removed too: IDs inside links (certificate UUIDs) are not phone numbers.
 URL = re.compile(r"https?://\S+")
+# Release versions (CalVer YYYY.MM.DD-NN, printed in the PDF footer) have ten digits.
+CALVER = re.compile(r"\b\d{4}\.\d{2}\.\d{2}-\d{2}\b")
 
 
 @dataclass(frozen=True)
@@ -64,7 +68,7 @@ def scan(entries, name, text):
 def phone_like(text):
     hits = []
     for lineno, line in enumerate(text.splitlines(), 1):
-        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", URL.sub(" ", line))):
+        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", CALVER.sub(" ", URL.sub(" ", line)))):
             if len(re.sub(r"\D", "", match.group())) >= 10:
                 hits.append(lineno)
                 break
@@ -86,6 +90,7 @@ def private_values_found(private, text):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--public", action="store_true")
+    parser.add_argument("--require-denylist", action="store_true")
     parser.add_argument("--denylist")
     parser.add_argument("--private")
     parser.add_argument("files", nargs="+")
@@ -98,6 +103,9 @@ def main(argv=None):
     else:
         where = f"at {args.denylist}" if args.denylist else "given (--denylist)"
         notes.append(f"no deny-list {where}, confidential-term check SKIPPED")
+    if args.require_denylist and not entries:
+        print("check_denylist: FAILED: deny-list required but missing or empty", file=sys.stderr)
+        return 1
 
     private = {}
     if args.public and args.private and os.path.exists(args.private):

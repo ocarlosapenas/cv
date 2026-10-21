@@ -9,6 +9,7 @@ from check_pdf import (
     parse_pdfinfo,
     pdf_ua_declared,
     section_order_ok,
+    version_on_every_page,
 )
 from cvlib import resolve
 
@@ -135,3 +136,9 @@ def test_volunteer_bullets_and_dates_checked(doc):
 def test_pdf_ua_declared():
     assert pdf_ua_declared(b"...<pdfuaid:part>1</pdfuaid:part>...")
     assert not pdf_ua_declared(b"%PDF-1.7 no xmp here")
+
+
+def test_version_on_every_page():
+    assert version_on_every_page("2026.10.21-01", "a 2026.10.21-01\fb 2026.10.21-01\f") == []
+    assert version_on_every_page("v1", "a v1\fb\f") == [2]
+    assert version_on_every_page("v1", "a\fb\fc v1") == [1, 2]

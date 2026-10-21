@@ -102,6 +102,14 @@ def dates_detached(model, text):
     return [f"{label} ({dates})" for label, dates in pairs if not any(label in ln and dates in ln for ln in lines)]
 
 
+def version_on_every_page(version, text):
+    """1-based numbers of the pages (split on form feed) whose text lacks `version`."""
+    pages = text.split("\f")
+    if pages and not pages[-1].strip():
+        pages = pages[:-1]
+    return [n for n, page in enumerate(pages, 1) if version not in page]
+
+
 def pdf_ua_declared(raw):
     return b"pdfuaid:part" in raw
 
@@ -148,6 +156,9 @@ def check(model, pdf_path):
     extra = extra_tokens(model, text)
     if extra:
         failures.append(f"text in the PDF that is not in cv.yaml (hidden text?): {', '.join(sorted(extra))}")
+    missing = version_on_every_page(meta["version"], text)
+    if missing:
+        failures.append(f"version {meta['version']} missing on page(s) {','.join(map(str, missing))}")
     for item in dates_detached(model, text):
         failures.append(f"dates not on the same line as their entry: {item}")
     return pages, len(fonts), failures
@@ -170,6 +181,7 @@ def main(argv=None):
     print(
         f"check_pdf {variant}: OK (pages {pages}/{model['meta']['max_pages']}, "
         f"{nfonts} fonts embedded with Unicode maps, tagged, PDF/UA-1, no hidden text, "
+        f"version {model['meta']['version']} on every page, "
         f"{model['meta']['verify_count']} claims pending verification)"
     )
     return 0
