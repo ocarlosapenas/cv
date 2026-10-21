@@ -14,6 +14,7 @@ RELEASE_VARIANTS ?= backend ai fde
 # PR preview: the base branch is built in a git worktree at build/base-src.
 BASE_BUILD ?= build/base-src/build
 PREVIEW := build/preview
+SCAN_REPORT ?= build/history-scan.md
 
 TODAY ?= $(shell date +%Y-%m)
 # Private self-reported sources (never committed): LinkedIn screening answers and old
@@ -25,7 +26,7 @@ SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yam
 # Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
 LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
 
-.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks preview
+.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks preview scan-history
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -88,6 +89,10 @@ lint:
 	@if [ -d .github/workflows ]; then \
 	  $(RUN) actionlint && $(RUN) zizmor --offline .github/workflows; \
 	fi
+
+## scan-history: deny-list, phone, private values and noreply emails over every object of every ref
+scan-history:
+	$(RUN) python3 scripts/scan_history.py --denylist $(DENYLIST) --private $(PRIVATE) $(DENYLIST_FLAGS) --report $(SCAN_REPORT)
 
 ## hooks: enable the git hooks in .githooks/ (commit rule, secrets, deny-list, spelling)
 hooks:
