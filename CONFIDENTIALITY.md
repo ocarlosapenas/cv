@@ -28,7 +28,7 @@ full git history, CI logs and artifacts, and every published PDF or JSON file.
 | `--public` guards in the same script | phone-like numbers and any value from the private contact file in a public output |
 | `scripts/check_pdf.py` hidden-text check | any text in the PDF that does not come from `cv.yaml` |
 | `.githooks/pre-commit` (gitleaks, deny-list, codespell on staged files) | secrets or confidential terms before they are committed |
-| `scripts/scan_history.py` (`make scan-history`, also weekly in CI) | confidential terms, phone numbers or private values in any blob of any ref, any commit or tag message, and any author or committer email that is not a GitHub noreply address |
+| `scripts/scan_history.py` (`make scan-history`, also weekly in CI) | confidential terms, phone numbers or private values in any blob of any fetched ref, any commit or tag message, and any author or committer email that is not a GitHub noreply address |
 | gitleaks over the whole history (`make lint`) | credentials and tokens |
 | CI artifacts limited to public build outputs, 14 days | private data in downloadable artifacts |
 | Repository starts private; full-history scan before it goes public | anything that slipped into history (rewriting history does not remove data others already fetched) |
@@ -36,3 +36,10 @@ full git history, CI logs and artifacts, and every published PDF or JSON file.
 The deny-list itself is confidential: it lists exactly what must not leak, so it is
 never committed. In CI it comes from the secret `CV_DENYLIST`, written to a `0600` file
 only for the check steps; a missing or empty secret fails the job.
+
+CI never sees the private contact file, so every private contact value must also be a
+deny-list entry. When both files exist, `make check` fails on any private value that no
+deny-list entry matches (reported by key name only).
+
+The weekly CI history scan covers the branches and tags it fetches; pull request refs
+are covered by the scan before the repository goes public.

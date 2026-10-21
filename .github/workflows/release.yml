@@ -37,24 +37,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # Branch protection is not available while the repository is private, so the
-      # commit rule is checked again on everything that reaches main.
+      # No draft from commits that break the commit rule (security.yml checks every
+      # push to main; this repeats it for the pushes that change the CV).
       - name: Check the commit subjects that reached main
         env:
           BEFORE: ${{ github.event.before }}
           EVENT: ${{ github.event_name }}
         run: |
           if [ "$EVENT" = push ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            commits=$(git rev-list --reverse "$BEFORE..$GITHUB_SHA")
+            tools/check-commit-range "$BEFORE..$GITHUB_SHA"
           else
-            commits=$GITHUB_SHA
+            tools/check-commit-range -1 "$GITHUB_SHA"
           fi
-          status=0
-          for sha in $commits; do
-            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
-            tools/check-commit-msg "$RUNNER_TEMP/message" || status=1
-          done
-          exit "$status"
 
       - name: Skip when the merged pull request has the skip-release label
         id: skip

@@ -58,7 +58,7 @@ Every workflow builds the same pinned image from `tools/Dockerfile` and runs the
 | Workflow | When | What |
 |---|---|---|
 | `pr.yml` | every pull request | commit rule on every commit; `make check`, LinkedIn limits; a sticky comment with page images, a visual diff and a text diff against the base branch |
-| `security.yml` | PRs, pushes to `main`, weekly | `make lint` (gitleaks over the whole history, codespell, actionlint, zizmor) and `make scan-history` |
+| `security.yml` | PRs, pushes to `main`, weekly | commit rule on every push to `main`; `make lint` (gitleaks over the whole history, codespell, actionlint, zizmor) and `make scan-history` |
 | `links.yml` | weekly, PRs that change `cv.yaml` | `make links`: lychee over `cv.yaml` and the links inside each PDF |
 | `release.yml` | pushes to `main` that change the CV | builds, checks and gates, then creates a **draft** release; publishing stays manual |
 | `reminder.yml` | quarterly | opens a "Quarterly CV review" issue |

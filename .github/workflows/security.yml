@@ -1,5 +1,6 @@
 # Secrets in the whole history (gitleaks), spelling, workflow lint (actionlint and
-# zizmor), and the confidentiality scan of every object of every ref.
+# zizmor), the confidentiality scan of every object of every fetched ref, and the commit
+# rule on every push to main (branch protection is not available while private).
 name: security
 
 on:
@@ -17,6 +18,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  commits:
+    name: commits
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # checkout and git log only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check the commit subjects that reached main
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            tools/check-commit-range "$BEFORE..$GITHUB_SHA"
+          else
+            tools/check-commit-range -1 "$GITHUB_SHA"
+          fi
+
   lint:
     name: lint
     runs-on: ubuntu-24.04
