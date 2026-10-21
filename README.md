@@ -9,7 +9,8 @@ PDF and to a JSON Resume file, with automated checks on every output.
 ## Quickstart
 
 Requires Docker and make. Nothing else is installed on the host: every tool runs in a
-pinned, network-less container (see `tools/`).
+pinned, network-less container (see `tools/`). The same image carries the lint and scan
+tools (gitleaks, actionlint, zizmor, codespell, lychee), pinned in `tools/tools.env`.
 
 ```sh
 tools/build.sh   # build the pinned toolchain image once

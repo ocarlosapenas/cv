@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 # Run one command inside the pinned cvkit container.
-# Usage (from the repository root): tools/run <command> [args...]
+# Usage (from the repository root): tools/run [--net] <command> [args...]
 #
 # Same isolation baseline as dockerized-tools: only the repository is mounted, no
 # network, no capabilities, read-only root, files owned by the host user.
+# --net is the one exception: it gives the command network access. Only the link
+# check (make links) uses it.
 set -euo pipefail
+
+network=(--network none)
+if [ "${1:-}" = "--net" ]; then
+  network=()
+  shift
+fi
 
 IMAGE="cv/cvkit:pinned"
 TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -33,11 +41,13 @@ fi
 tty_flags=()
 if [ -t 0 ] && [ -t 1 ]; then tty_flags=(-it); fi
 
+# git inside the container must trust the mounted repository (gitleaks, history scan).
 exec docker run --rm ${tty_flags[@]+"${tty_flags[@]}"} \
-  --network none \
+  ${network[@]+"${network[@]}"} \
   --user "$(id -u):$(id -g)" \
   -e HOME=/tmp \
   -e PYTHONDONTWRITEBYTECODE=1 \
+  -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/work \
   -v "$PWD":/work -w /work \
   --cap-drop ALL \
   --security-opt no-new-privileges \
