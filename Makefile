@@ -11,6 +11,9 @@ PRIVATE := private/contact.private.yaml
 DENYLIST_FLAGS := $(if $(CI),--require-denylist)
 # Variants published in each release (constant name + dated copy).
 RELEASE_VARIANTS ?= backend ai fde
+# PR preview: the base branch is built in a git worktree at build/base-src.
+BASE_BUILD ?= build/base-src/build
+PREVIEW := build/preview
 
 TODAY ?= $(shell date +%Y-%m)
 # Private self-reported sources (never committed): LinkedIn screening answers and old
@@ -22,7 +25,7 @@ SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yam
 # Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
 LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
 
-.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks
+.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks preview
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -58,6 +61,25 @@ release-assets:
 	rm -rf build/release
 	$(RUN) python3 scripts/release_assets.py --copy build --out build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
 	$(RUN) python3 scripts/release_assets.py --verify build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
+
+## preview: page PNGs, text diff and visual diff against $(BASE_BUILD) -> $(PREVIEW)/comment.md
+## (build both sides with the same VERSION, e.g. preview, so the footer is not a change)
+preview:
+	rm -rf $(PREVIEW) && mkdir -p $(PREVIEW)/base
+	@for v in $(VARIANTS); do \
+	  $(RUN) pdftoppm -r 70 -png build/$$v/cv.pdf $(PREVIEW)/$$v-page \
+	  && $(RUN) pdftotext -raw -enc UTF-8 build/$$v/cv.pdf $(PREVIEW)/$$v.txt || exit 1; \
+	  if [ -f $(BASE_BUILD)/$$v/cv.pdf ]; then \
+	    $(RUN) pdftoppm -r 70 -png $(BASE_BUILD)/$$v/cv.pdf $(PREVIEW)/base/$$v-page \
+	    && $(RUN) pdftotext -raw -enc UTF-8 $(BASE_BUILD)/$$v/cv.pdf $(PREVIEW)/base/$$v.txt || exit 1; \
+	    $(RUN) git diff --no-index -U1 $(PREVIEW)/base/$$v.txt $(PREVIEW)/$$v.txt > $(PREVIEW)/$$v.diff; \
+	    [ $$? -le 1 ] || exit 1; \
+	    $(RUN) python3 scripts/pdf_diff.py --base $(PREVIEW)/base/$$v-page --head $(PREVIEW)/$$v-page \
+	      --out $(PREVIEW) --json $(PREVIEW)/$$v-diff.json || exit 1; \
+	  fi; \
+	done
+	$(RUN) python3 scripts/release_gate.py cv.yaml --report > $(PREVIEW)/gate.md
+	$(RUN) python3 scripts/pr_comment.py --dir $(PREVIEW) --variants "$(VARIANTS)" --gate $(PREVIEW)/gate.md --out $(PREVIEW)/comment.md
 
 ## lint: secrets in the whole history, spelling, and workflow lint (the same as CI)
 lint:
