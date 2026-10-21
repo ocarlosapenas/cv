@@ -74,7 +74,7 @@ jobs:
         run: make linkedin
 
       - name: Render the preview
-        run: make preview
+        run: make preview ARTIFACT_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
       - name: Remove the deny-list
         if: always()
@@ -107,16 +107,20 @@ jobs:
           name: cv-preview
           path: cv-preview
 
+      # The Actions token cannot upload comment attachments (gh --attach fails with
+      # "unsupported authentication type"), so the comment links to this run's artifact.
+      # The sticky comment is the bot's last comment that starts with the marker.
       - name: Post or update the preview comment
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          gh --version | head -n 1
-          cd cv-preview/preview
-          attach=()
-          while read -r file; do
-            attach+=(--attach "./$file")
-          done < <(grep -oE '\]\(\./[A-Za-z0-9._-]+\.png\)' comment.md | sed -E 's/^\]\(\.\/(.*)\)$/\1/' | sort -u)
-          gh pr comment "$PR" -R "$GITHUB_REPOSITORY" --edit-last --create-if-none \
-            --body-file comment.md "${attach[@]}"
+          body=cv-preview/preview/comment.md
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]") | select(.body | startswith("<!-- cv-preview -->")) | .id' |
+            tail -n 1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F "body=@$body" --jq .html_url
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F "body=@$body" --jq .html_url
+          fi

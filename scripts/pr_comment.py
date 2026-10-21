@@ -1,10 +1,13 @@
 """Markdown body of the sticky PR preview comment.
 
 Usage: pr_comment.py --dir build/preview --variants "backend ai fde" --gate FILE --out FILE
+                     [--artifact-url URL]
 
 Reads, per variant, the page PNGs (<v>-page-<n>.png), the visual diff
-(<v>-diff.json, from pdf_diff.py) and the text diff (<v>.diff). Images are referenced
-as ./<file>.png; `gh pr comment --attach ./<file>.png` uploads them and rewrites the links.
+(<v>-diff.json, from pdf_diff.py) and the text diff (<v>.diff). Locally the comment
+references the page images as ./<file>.png. In CI (--artifact-url) it links to the run
+instead: the Actions token cannot upload comment attachments, so the images and the
+visual diff stay in the run's cv-preview artifact.
 """
 
 import argparse
@@ -36,7 +39,7 @@ def _truncate(diff_text, allowance):
     return cut + f"... {TRUNCATED}\n"
 
 
-def render(variants, text_diffs, gate, max_chars=60000):
+def render(variants, text_diffs, gate, max_chars=60000, artifact_url=None):
     head = [MARKER, "## CV preview", "", "| Variant | Pages | Changed pages |", "|---|---|---|"]
     for v in variants:
         if v["diff"] is None:
@@ -46,6 +49,9 @@ def render(variants, text_diffs, gate, max_chars=60000):
         head.append(f"| {v['name']} | {v['pages']}/{v['max_pages']} | {changed} |")
     head += ["", gate, ""]
 
+    if artifact_url:
+        head += [f"Page images and the visual diff (changed pixels in red) are in the `cv-preview` "
+                 f"artifact of [this run]({artifact_url}).", ""]
     if any(v["diff"] is None for v in variants):
         head += [NO_BASE, ""]
     elif not any(_changed_pages(v["diff"]) for v in variants) and not any(
@@ -56,9 +62,11 @@ def render(variants, text_diffs, gate, max_chars=60000):
     sections, diffs = [], []
     for v in variants:
         name = v["name"]
-        part = [f"### {name}", "", " ".join(f"![{name} page {n}](./{f})" for n, f in enumerate(v["previews"], 1)), ""]
+        part = [f"### {name}", ""]
+        if not artifact_url:
+            part += [" ".join(f"![{name} page {n}](./{f})" for n, f in enumerate(v["previews"], 1)), ""]
         overlays = [p for p in v["diff"] or [] if p["overlay"]]
-        if overlays:
+        if overlays and not artifact_url:
             part += ["Changes in red: " + " ".join(
                 f"![{name} page {p['page']} changes](./{os.path.basename(p['overlay'])})" for p in overlays
             ), ""]
@@ -73,6 +81,8 @@ def render(variants, text_diffs, gate, max_chars=60000):
 
     body_sections = []
     for section, (name, text) in zip(sections, diffs):
+        if artifact_url and not text:
+            continue  # nothing to show for this variant without images
         body_sections.append(section + ("\n" + _details(name, _truncate(text, allowance)) if text else ""))
     body = "\n".join(head) + "\n" + "\n\n".join(body_sections) + "\n"
     return body[:max_chars]
@@ -97,6 +107,7 @@ def main(argv=None):
     parser.add_argument("--variants", default="backend ai fde")
     parser.add_argument("--gate", required=True)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--artifact-url")
     args = parser.parse_args(argv)
 
     variants, text_diffs = [], {}
@@ -115,7 +126,7 @@ def main(argv=None):
     with open(args.gate, encoding="utf-8") as fh:
         gate = fh.read().strip()
 
-    body = render(variants, text_diffs, gate)
+    body = render(variants, text_diffs, gate, artifact_url=args.artifact_url)
     with open(args.out, "w", encoding="utf-8") as fh:
         fh.write(body)
     print(f"pr_comment: wrote {args.out} ({len(body)} characters)")

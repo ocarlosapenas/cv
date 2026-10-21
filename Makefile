@@ -64,7 +64,8 @@ release-assets:
 	$(RUN) python3 scripts/release_assets.py --verify build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
 
 ## preview: page PNGs, text diff and visual diff against $(BASE_BUILD) -> $(PREVIEW)/comment.md
-## (build both sides with the same VERSION, e.g. preview, so the footer is not a change)
+## (build both sides with the same VERSION, e.g. preview, so the footer is not a change;
+## ARTIFACT_URL=<run url> links to the CI artifact instead of embedding the images)
 preview:
 	rm -rf $(PREVIEW) && mkdir -p $(PREVIEW)/base
 	@for v in $(VARIANTS); do \
@@ -80,7 +81,8 @@ preview:
 	  fi; \
 	done
 	$(RUN) python3 scripts/release_gate.py cv.yaml --report > $(PREVIEW)/gate.md
-	$(RUN) python3 scripts/pr_comment.py --dir $(PREVIEW) --variants "$(VARIANTS)" --gate $(PREVIEW)/gate.md --out $(PREVIEW)/comment.md
+	$(RUN) python3 scripts/pr_comment.py --dir $(PREVIEW) --variants "$(VARIANTS)" --gate $(PREVIEW)/gate.md --out $(PREVIEW)/comment.md \
+	  $(if $(ARTIFACT_URL),--artifact-url "$(ARTIFACT_URL)")
 
 ## lint: secrets in the whole history, spelling, and workflow lint (the same as CI)
 lint:
