@@ -41,6 +41,15 @@ For each variant `backend`, `ai`, `fde`, under `build/<variant>/`:
 - `make private` builds PDFs with private contact details into `build/private/`.
   They are never published.
 
+## Keeping the CV current
+
+The `cv-propose` skill (`.claude/skills/cv-propose/SKILL.md`) reads new evidence (a dated
+evolution log, session notes and merged pull requests) and writes English bullet
+proposals to `private/proposals/<date>.md` for review. Configure the sources in
+`private/cv-propose.yaml` (format: `cv-propose.example.yaml`). Only approved bullets reach
+`cv.yaml`; unconfirmed numbers enter with `status: verify`, which blocks releases until
+they are confirmed. A quarterly issue (`reminder.yml`) is the prompt to run it.
+
 ## CI and releases
 
 Every workflow builds the same pinned image from `tools/Dockerfile` and runs the same
