@@ -1,0 +1,51 @@
+# Secrets in the whole history (gitleaks), spelling, workflow lint (actionlint and
+# zizmor), and the confidentiality scan of every object of every ref.
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read # checkout and history scan only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build the toolchain image
+        run: tools/build.sh
+
+      - name: Write the deny-list
+        env:
+          CV_DENYLIST: ${{ secrets.CV_DENYLIST }}
+        run: |
+          mkdir -p private
+          umask 077
+          printf '%s\n' "$CV_DENYLIST" > private/denylist.local
+
+      - name: Secrets, spelling and workflow lint
+        run: make lint
+
+      - name: Confidentiality scan of the whole history
+        run: make scan-history
+
+      - name: Remove the deny-list
+        if: always()
+        run: rm -f private/denylist.local

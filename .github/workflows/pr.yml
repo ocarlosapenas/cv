@@ -1,0 +1,133 @@
+# Pull request checks: the commit rule, every CV check on the same pinned toolchain as
+# the local machine, and a sticky preview comment (page images, visual and text diff
+# against the base branch).
+name: pr
+
+on:
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  commits:
+    name: commits
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # checkout and git log only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check every commit subject in the pull request
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          for sha in $(git rev-list --reverse "$BASE_SHA..$HEAD_SHA"); do
+            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
+            if tools/check-commit-msg "$RUNNER_TEMP/message"; then
+              echo "ok   ${sha:0:7}"
+            else
+              echo "FAIL ${sha:0:7}"
+              status=1
+            fi
+          done
+          exit "$status"
+
+  build:
+    name: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read # runs repository code, so read-only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # The base branch is built with its own toolchain, before the head image.
+      - name: Build the base branch for comparison
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add build/base-src "$BASE_SHA"
+          if (cd build/base-src && tools/build.sh && make build VERSION=preview); then
+            echo "base branch built"
+          else
+            echo "::notice::the base branch could not be built; the preview has no comparison"
+            rm -rf build/base-src/build
+          fi
+
+      - name: Build the toolchain image
+        run: tools/build.sh
+
+      - name: Write the deny-list
+        env:
+          CV_DENYLIST: ${{ secrets.CV_DENYLIST }}
+        run: |
+          mkdir -p private
+          umask 077
+          printf '%s\n' "$CV_DENYLIST" > private/denylist.local
+
+      - name: Check every variant
+        run: make check VERSION=preview
+
+      - name: Check the LinkedIn text limits
+        run: make linkedin
+
+      - name: Render the preview
+        run: make preview
+
+      - name: Remove the deny-list
+        if: always()
+        run: rm -f private/denylist.local
+
+      # Public outputs only: the repository may become public, and artifacts stay
+      # downloadable for the retention period.
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: cv-preview
+          path: |
+            build/preview/
+            build/backend/cv.pdf
+            build/ai/cv.pdf
+            build/fde/cv.pdf
+          if-no-files-found: error
+          retention-days: 14
+
+  comment:
+    name: comment
+    needs: build
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # post the preview comment; no checkout, runs no repository code
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: cv-preview
+          path: cv-preview
+
+      - name: Post or update the preview comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh --version | head -n 1
+          cd cv-preview/preview
+          attach=()
+          while read -r file; do
+            attach+=(--attach "./$file")
+          done < <(grep -oE '\]\(\./[A-Za-z0-9._-]+\.png\)' comment.md | sed -E 's/^\]\(\.\/(.*)\)$/\1/' | sort -u)
+          gh pr comment "$PR" -R "$GITHUB_REPOSITORY" --edit-last --create-if-none \
+            --body-file comment.md "${attach[@]}"

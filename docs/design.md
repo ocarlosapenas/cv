@@ -31,11 +31,11 @@ The render model (`resolved.json`) is the only input of every output. Variant lo
 | D4 | Variants `backend`, `ai`, `fde` from tags and per-variant values | Phase 1 (see deviations) |
 | D5 | Public/private split; local deny-list | Phase 1 |
 | D6 | Pinned toolchain in a container with the dockerized-tools baseline | Phase 1 (see deviations) |
-| D7 | CI workflows: PR preview, release, weekly link check, workflow security | Phase 3 |
-| D8 | CalVer releases, immutable, stable `releases/latest/download/` link | Phase 3 |
-| D9 | Commit subject rule enforced locally and in CI | Phase 3 |
+| D7 | CI workflows: PR preview, release, weekly link check, workflow security | Phase 3 (`.github/workflows/`) |
+| D8 | CalVer releases, immutable, stable `releases/latest/download/` link | Phase 3 (draft by CI, published by hand) |
+| D9 | Commit subject rule enforced locally and in CI | Phase 3 (`tools/check-commit-msg`, `.githooks/`) |
 | D10 | LinkedIn: official export in, paste-ready text out, all edits manual | Phase 2 |
-| D11 | Living CV: local proposal skill, human approval, `status: verify` gate | Phase 3 |
+| D11 | Living CV: local proposal skill, human approval, `status: verify` gate | Phase 3 (`release_gate.py`, `cv-propose`) |
 | D12 | Content rewrite applying the research checklist | Phase 2 |
 | D13 | Flagship SDK + evals project | Icebox (outside this repository) |
 | D14 | Repository starts private; full-history scan before going public | Phase 1 → 3 |
@@ -54,6 +54,22 @@ Both deviations below were approved on 2026-10-16, together with the Phase 1 des
   same Dockerfile for exact local/CI parity. The wrapper `tools/run` keeps the
   dockerized-tools baseline flag for flag.
 
+## Deviations in Phase 3
+
+Approved on 2026-10-21 with the Phase 3 plan (`docs/plans/2026-10-21-phase-3.md`).
+
+- **Hooks:** plain git hooks in `.githooks/` that call the pinned image, instead of the
+  pre-commit framework, which installs itself and its hook environments on the host.
+- **Spelling:** codespell from the Debian archive instead of typos (prose content, a
+  signed package, one checksum pin less). check-jsonschema is not used: the scripts
+  already validate `cv.yaml` and JSON Resume with python3-jsonschema.
+- **Visual diff:** pdftoppm plus a small PIL script instead of diff-pdf, which is not
+  in Debian.
+- **Links:** lychee from the same image; only that command gets network access
+  (`tools/run --net`).
+- **Publishing:** CI creates a draft release and a person publishes it (GitHub's
+  draft, attach, publish flow for immutable releases).
+
 ## Toolchain
 
 | Piece | Pin | Why this source |
@@ -62,9 +78,28 @@ Both deviations below were approved on 2026-10-16, together with the Phase 1 des
 | Typst | 0.15.1 musl binary, SHA256 per arch | Official release, checksum instead of a mutable tag |
 | poppler-utils, python3, PyYAML, jsonschema, pytest | Debian trixie archive | Signed packages, long past the 2-day window, no pip in the image |
 | JSON Resume schema | vendored 1.3.1, integrity recorded in `schemas/README.md` | Validation without npm or network |
+| git, codespell, shellcheck, python3-pil, ca-certificates | Debian trixie archive | Same reason as the Python libraries |
+| gitleaks 8.30.1, actionlint 1.7.12, zizmor 1.31.1, lychee 0.24.2 | release binaries, SHA256 per arch in `tools/tools.env` | Same pattern as Typst |
 
 `tools/build.sh` labels the image with a hash of `tools/Dockerfile` + `tools/tools.env`;
 `tools/run` refuses a stale image, so a changed pin never runs on the old toolchain.
+
+## CI
+
+Each workflow builds `tools/Dockerfile` with `tools/build.sh`, so CI and the local
+machine run the same toolchain; the workflows only orchestrate.
+
+- Top-level `permissions: {}`; each job asks for the minimum. Jobs that run repository
+  code have a read-only token. The PR comment job has `pull-requests: write`, runs no
+  repository code and only posts the artifact it downloads. The release job builds,
+  checks and gates before it touches releases.
+- Every action is pinned by commit SHA; every checkout uses `persist-credentials: false`.
+- The deny-list comes from the secret `CV_DENYLIST`, written to a `0600` file for the
+  check steps and removed afterwards. In CI a missing deny-list fails the job
+  (`--require-denylist`). Checks report deny-list line numbers, never terms.
+- Artifacts hold public build outputs only, kept 14 days.
+- Branch protection is not available while the repository is private on the Free plan,
+  so the commit rule also runs on every push to `main`.
 
 ## Checks and what they prove
 
@@ -80,6 +115,9 @@ Both deviations below were approved on 2026-10-16, together with the Phase 1 des
 | Dates on the same line as their entry | Entry/date association survives extraction |
 | No extra tokens | Nothing in the PDF that is not in `cv.yaml` (hidden text, prompt injection) |
 | Deny-list and public guards | See `CONFIDENTIALITY.md` |
+| Version on every page | The PDF is tied to its release tag |
+| Release gate | No release while any claim has `status: verify` |
+| Commit rule | One-line `feat:`/`fix:`/`chore:` subjects, locally and in CI |
 
 ## Known limitations
 

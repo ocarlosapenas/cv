@@ -26,7 +26,7 @@ SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yam
 # Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
 LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
 
-.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks preview scan-history
+.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks preview scan-history links
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -93,6 +93,13 @@ lint:
 ## scan-history: deny-list, phone, private values and noreply emails over every object of every ref
 scan-history:
 	$(RUN) python3 scripts/scan_history.py --denylist $(DENYLIST) --private $(PRIVATE) $(DENYLIST_FLAGS) --report $(SCAN_REPORT)
+
+## links: check every link in cv.yaml and inside the rendered PDFs (network access; run make build first)
+links:
+	@for v in $(VARIANTS); do \
+	  $(RUN) pdftohtml -q -i -s -noframes -stdout build/$$v/cv.pdf > build/$$v/links.html || exit 1; \
+	done
+	$(RUN) --net lychee --config .lychee.toml --no-progress cv.yaml $(foreach v,$(VARIANTS),build/$(v)/links.html)
 
 ## hooks: enable the git hooks in .githooks/ (commit rule, secrets, deny-list, spelling)
 hooks:

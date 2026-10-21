@@ -1,0 +1,40 @@
+# Quarterly reminder to bring the CV up to date (see .github/quarterly-review.md).
+name: reminder
+
+on:
+  schedule:
+    - cron: "0 12 1 1,4,7,10 *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: reminder
+  cancel-in-progress: false
+
+jobs:
+  issue:
+    name: issue
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read # checkout of the issue template
+      issues: write # open the reminder issue
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open the quarterly review issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh issue list -R "$GITHUB_REPOSITORY" --label cv-review --state open --json number --jq '.[].number')
+          if [ -n "$open" ]; then
+            echo "an open cv-review issue already exists: #$open"
+            exit 0
+          fi
+          month=$(date -u +%m)
+          quarter=$(( (10#$month - 1) / 3 + 1 ))
+          gh issue create -R "$GITHUB_REPOSITORY" --title "Quarterly CV review $(date -u +%Y) Q$quarter" \
+            --label cv-review --body-file .github/quarterly-review.md

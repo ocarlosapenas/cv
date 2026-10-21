@@ -31,8 +31,8 @@ def test_comment_starts_with_marker_and_lists_variants():
 def test_comment_without_base():
     body = render([variant("backend", None)], {}, READY)
     assert "No base build to compare with." in body
-    assert "![backend page 1](backend-page-1.png)" in body
-    assert "![backend page 2](backend-page-2.png)" in body
+    assert "![backend page 1](./backend-page-1.png)" in body
+    assert "![backend page 2](./backend-page-2.png)" in body
 
 
 def test_identical_builds_report_no_changes():
@@ -45,7 +45,7 @@ def test_changed_page_shows_overlay_and_text_diff():
     diff = "@@ -1 +1 @@\n-Old bullet\n+New bullet\n"
     body = render([variant("backend", CHANGED)], {"backend": diff}, READY)
     assert "| backend | 2/2 | 2 |" in body
-    assert "![backend page 2 changes](backend-page-2-changes.png)" in body
+    assert "![backend page 2 changes](./backend-page-2-changes.png)" in body
     assert "```diff\n" + diff in body
     assert "No visual or text changes." not in body
 
