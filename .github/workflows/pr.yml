@@ -29,18 +29,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          status=0
-          for sha in $(git rev-list --reverse "$BASE_SHA..$HEAD_SHA"); do
-            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
-            if tools/check-commit-msg "$RUNNER_TEMP/message"; then
-              echo "ok   ${sha:0:7}"
-            else
-              echo "FAIL ${sha:0:7}"
-              status=1
-            fi
-          done
-          exit "$status"
+        run: tools/check-commit-range "$BASE_SHA..$HEAD_SHA"
 
   build:
     name: build

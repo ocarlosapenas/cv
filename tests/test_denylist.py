@@ -1,4 +1,4 @@
-from check_denylist import load_denylist, main, phone_like, private_values_found, scan
+from check_denylist import load_denylist, main, phone_like, private_values_found, scan, uncovered_private_values
 
 DENYLIST = """# confidential terms, one per line
 Project Nebula
@@ -95,3 +95,34 @@ def test_require_denylist_passes_with_entries(tmp_path):
     target = tmp_path / "cv.txt"
     target.write_text("nothing confidential\n")
     assert main(["--require-denylist", "--denylist", str(denylist), str(target)]) == 0
+
+
+def test_phone_like_ignores_hex_hashes():
+    # Commit and checksum hashes often hold ten or more decimal digits in a row.
+    text = "\n".join([
+        "Merge 3fa1234567890bcd1234ef56789aa0b1c2d3e4f5 into 9b0987654321fedcba0987654321fedcba098765",
+        "LYCHEE_SHA256_AMD64=ab12345678901cdef4f0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af9730",
+        "uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+        "pinned 0123456789abcdef0123456789abcdef01234567, call +55 42 99999-9999",
+    ])
+    assert phone_like(text) == [4]
+
+
+def test_uncovered_private_values():
+    entries = load_denylist(DENYLIST + "re:555.?010.?0000\n")
+    private = {"phone": "+1 555 010 0000", "email": "alex.private@example.com"}
+    assert uncovered_private_values(private, entries) == ["email"]
+
+
+def test_public_check_fails_when_private_value_not_in_denylist(tmp_path, capsys):
+    denylist = tmp_path / "denylist.local"
+    denylist.write_text(DENYLIST)
+    private = tmp_path / "contact.private.yaml"
+    private.write_text("email: alex.private@example.com\n")
+    target = tmp_path / "cv.txt"
+    target.write_text("nothing private here\n")
+    code = main(["--public", "--denylist", str(denylist), "--private", str(private), str(target)])
+    out = capsys.readouterr()
+    assert code == 1
+    assert "private 'email' value is not covered by any deny-list entry" in out.err
+    assert "alex.private" not in out.out + out.err

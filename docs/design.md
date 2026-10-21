@@ -99,7 +99,9 @@ machine run the same toolchain; the workflows only orchestrate.
   (`--require-denylist`). Checks report deny-list line numbers, never terms.
 - Artifacts hold public build outputs only, kept 14 days.
 - Branch protection is not available while the repository is private on the Free plan,
-  so the commit rule also runs on every push to `main`.
+  so the commit rule also runs on every push to `main` (`security.yml`, job `commits`,
+  with no path filter). CI checks the recorded message (`--recorded`), where a line
+  starting with `#` is part of the commit, not a comment.
 
 ## Checks and what they prove
 

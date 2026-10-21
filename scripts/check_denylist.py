@@ -28,6 +28,9 @@ ISO_DATE = re.compile(r"\b(?:19|20)\d{2}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3
 URL = re.compile(r"https?://\S+")
 # Release versions (CalVer YYYY.MM.DD-NN, printed in the PDF footer) have ten digits.
 CALVER = re.compile(r"\b\d{4}\.\d{2}\.\d{2}-\d{2}\b")
+# Hex hashes (commit SHAs, checksums) often hold ten or more decimal digits in a row.
+# A token of 7+ hex characters with at least one letter is a hash, never a phone number.
+HEX_HASH = re.compile(r"\b(?=[0-9a-fA-F]*[a-fA-F])[0-9a-fA-F]{7,}\b")
 
 
 @dataclass(frozen=True)
@@ -68,7 +71,7 @@ def scan(entries, name, text):
 def phone_like(text):
     hits = []
     for lineno, line in enumerate(text.splitlines(), 1):
-        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", CALVER.sub(" ", URL.sub(" ", line)))):
+        for match in PHONE_CANDIDATE.finditer(ISO_DATE.sub(" ", CALVER.sub(" ", HEX_HASH.sub(" ", URL.sub(" ", line))))):
             if len(re.sub(r"\D", "", match.group())) >= 10:
                 hits.append(lineno)
                 break
@@ -85,6 +88,18 @@ def private_values_found(private, text):
         if value.casefold() in folded or (len(digits) >= 8 and digits in compact):
             found.append(key)
     return found
+
+
+def uncovered_private_values(private, entries):
+    """Keys of private values that no deny-list entry matches.
+
+    CI has the deny-list (a secret) but never the private contact file, so the deny-list
+    is what catches a private value there. Reports key names only.
+    """
+    return [
+        key for key, value in private.items()
+        if str(value).strip() and not any(_matches(entry, str(value)) for entry in entries)
+    ]
 
 
 def main(argv=None):
@@ -116,6 +131,11 @@ def main(argv=None):
         notes.append(f"no private contact file {where}, private-value check SKIPPED")
 
     findings = []
+    if args.public and private and entries:
+        findings += [
+            f"private '{key}' value is not covered by any deny-list entry (CI has only the deny-list)"
+            for key in uncovered_private_values(private, entries)
+        ]
     for path in args.files:
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
