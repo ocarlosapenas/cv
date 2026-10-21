@@ -36,7 +36,7 @@ Never write to the source folders.
 |---|---|
 | Actor | In many notes "I" or "eu" is the assistant. Set `Actor: owner` only when the note shows the owner did or decided it, and quote that line. Otherwise `Actor: assistant` (drop it) or `Actor: unclear` (ask). |
 | Shipped | Propose only work that reached production or was finished. In-progress work gets `Decision: wait` and the date to look again. |
-| Confidential | Drop security incidents and vulnerabilities, sensitive data found where it should not be, internal system, service or repository names, customer, tenant or partner names, and financial figures. Generalize only if what is left still says something true. See `CONFIDENTIALITY.md`. |
+| Confidential | Drop anything `CONFIDENTIALITY.md` lists as employer-confidential: security incidents or vulnerabilities, internal system, service or repository names, customer, tenant or partner names, and financial figures. Generalize only if what is left still says something true. |
 | Numbers | List every number in the bullet under "Numbers to confirm", with the source line. |
 | Duplicate | If an existing `cv.yaml` bullet already says it, propose an edit to that bullet instead. |
 
@@ -91,5 +91,5 @@ Never commit, push or open a PR without the owner's OK for that action.
 | A paste-ready YAML block for every candidate | Proposals first; YAML only for approved items |
 | Building PDFs with unapproved bullets | Build only in step 6 |
 | "Led", "built", "found" for something the assistant did | Actor rule, with a quoted line |
-| Hinting at an incident ("sensitive data in a log table") | Drop it; there is no safe paraphrase |
+| Paraphrasing a confidential item instead of dropping it | Drop it; a vague version still points to it |
 | A bullet for work that has not shipped | `Decision: wait` |
