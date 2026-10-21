@@ -1,0 +1,16 @@
+# Sources for the cv-propose skill (.claude/skills/cv-propose/SKILL.md).
+# Copy to private/cv-propose.yaml (gitignored) and point it at your own notes.
+
+# File with an append-only, dated evolution log; the skill reads only that section.
+registro: /path/to/notes/programmer-profile.md
+registro_heading: "Registro de Evolução"
+
+# Session notes, one folder per context, each note with a `data: YYYY-MM-DD` frontmatter field.
+sessions: /path/to/notes/raw/sessions
+contexts: [work, learning]
+
+# GitHub login whose merged pull requests are counted (aggregated per owner, never named).
+github_user: your-github-login
+
+# Where proposals are written (keep it under private/).
+proposals_dir: private/proposals
