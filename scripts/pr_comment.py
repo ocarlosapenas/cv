@@ -3,8 +3,8 @@
 Usage: pr_comment.py --dir build/preview --variants "backend ai fde" --gate FILE --out FILE
 
 Reads, per variant, the page PNGs (<v>-page-<n>.png), the visual diff
-(<v>-diff.json, from pdf_diff.py) and the text diff (<v>.diff). Image references are
-plain file names; `gh pr comment --attach` uploads those files and rewrites the links.
+(<v>-diff.json, from pdf_diff.py) and the text diff (<v>.diff). Images are referenced
+as ./<file>.png; `gh pr comment --attach ./<file>.png` uploads them and rewrites the links.
 """
 
 import argparse
@@ -56,11 +56,11 @@ def render(variants, text_diffs, gate, max_chars=60000):
     sections, diffs = [], []
     for v in variants:
         name = v["name"]
-        part = [f"### {name}", "", " ".join(f"![{name} page {n}]({f})" for n, f in enumerate(v["previews"], 1)), ""]
+        part = [f"### {name}", "", " ".join(f"![{name} page {n}](./{f})" for n, f in enumerate(v["previews"], 1)), ""]
         overlays = [p for p in v["diff"] or [] if p["overlay"]]
         if overlays:
             part += ["Changes in red: " + " ".join(
-                f"![{name} page {p['page']} changes]({os.path.basename(p['overlay'])})" for p in overlays
+                f"![{name} page {p['page']} changes](./{os.path.basename(p['overlay'])})" for p in overlays
             ), ""]
         sections.append("\n".join(part))
         diff_text = text_diffs.get(name, "")

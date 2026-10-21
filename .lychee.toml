@@ -1,0 +1,7 @@
+# Link check (make links). LinkedIn answers 999 to automated requests; 403 and 429
+# are rate limits or bot walls, not broken links.
+accept = ["200..=299", "403", "429", "999"]
+max_retries = 2
+timeout = 20
+# pdftohtml adds page anchors (cv.html#N) that are not links in the CV.
+exclude = ['cv\.html']

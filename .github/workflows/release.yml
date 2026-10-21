@@ -1,0 +1,153 @@
+# Releases. A push to main that changes the CV builds every variant, runs every check
+# and the release gate, and creates a DRAFT release with CalVer YYYY.MM.DD-NN.
+# Publishing the draft is a human decision. Once published, the verify job downloads
+# the assets and checks names, dated copies and the version on every page.
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - cv.yaml
+      - "template/**"
+      - scripts/cvlib.py
+      - scripts/resolve.py
+      - "tools/**"
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  draft:
+    name: draft
+    if: github.event_name != 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write # create the draft release and upload its assets
+      pull-requests: read # read the skip-release label of the merged pull request
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Branch protection is not available while the repository is private, so the
+      # commit rule is checked again on everything that reaches main.
+      - name: Check the commit subjects that reached main
+        env:
+          BEFORE: ${{ github.event.before }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = push ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            commits=$(git rev-list --reverse "$BEFORE..$GITHUB_SHA")
+          else
+            commits=$GITHUB_SHA
+          fi
+          status=0
+          for sha in $commits; do
+            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/message"
+            tools/check-commit-msg "$RUNNER_TEMP/message" || status=1
+          done
+          exit "$status"
+
+      - name: Skip when the merged pull request has the skip-release label
+        id: skip
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          labels=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '.[].labels[].name')
+          if printf '%s\n' "$labels" | grep -qx skip-release; then
+            echo "::notice::the merged pull request has the skip-release label; no draft release"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the toolchain image
+        if: steps.skip.outputs.skip != 'true'
+        run: tools/build.sh
+
+      - name: Next CalVer version
+        id: version
+        if: steps.skip.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build
+          { git tag -l; gh release list -R "$GITHUB_REPOSITORY" --limit 200 --json tagName --jq '.[].tagName'; } > build/existing.txt
+          version=$(tools/run python3 scripts/calver.py --today "$(TZ=America/Sao_Paulo date +%F)" --existing build/existing.txt)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Write the deny-list
+        if: steps.skip.outputs.skip != 'true'
+        env:
+          CV_DENYLIST: ${{ secrets.CV_DENYLIST }}
+        run: |
+          mkdir -p private
+          umask 077
+          printf '%s\n' "$CV_DENYLIST" > private/denylist.local
+
+      - name: Check, gate and name the assets
+        if: steps.skip.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          make check VERSION="$VERSION"
+          make release-gate VERSION="$VERSION"
+          make release-assets VERSION="$VERSION"
+
+      - name: Remove the deny-list
+        if: always()
+        run: rm -f private/denylist.local
+
+      # At most one draft is pending: an older unpublished draft is replaced.
+      # Published releases are never touched.
+      - name: Create the draft release
+        if: steps.skip.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release list -R "$GITHUB_REPOSITORY" --limit 200 --json tagName,isDraft \
+            --jq '.[] | select(.isDraft) | .tagName' |
+            while read -r tag; do gh release delete "$tag" -R "$GITHUB_REPOSITORY" --yes; done
+          gh release create "$VERSION" -R "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" \
+            --title "CV $VERSION" --generate-notes build/release/*.pdf
+          url=$(gh release view "$VERSION" -R "$GITHUB_REPOSITORY" --json url --jq .url)
+          {
+            echo "Draft release $VERSION: $url"
+            echo
+            echo "Publish it with: gh release edit $VERSION --draft=false --latest"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: verify
+    if: github.event_name == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read # checkout and download the release assets
+    concurrency:
+      group: verify-${{ github.event.release.tag_name }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - name: Build the toolchain image
+        run: tools/build.sh
+
+      - name: Download and verify the published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" -D build/published
+          tools/run python3 scripts/release_assets.py --verify build/published --tag "$TAG"

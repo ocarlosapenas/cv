@@ -77,11 +77,11 @@ FROM ${BASE_IMAGE}
 # python3 libraries come from Debian rather than PyPI: signed, long past the 2-day
 # window, and no pip in the image at all. python3-pil draws the visual PR diff.
 # git: history scan and gitleaks; codespell: spelling; shellcheck: used by actionlint
-# for the run: scripts in workflows.
+# for the run: scripts in workflows; ca-certificates: TLS for the link check (lychee).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        poppler-utils python3 python3-yaml python3-jsonschema python3-pytest python3-pil \
-       git codespell shellcheck \
+       git codespell shellcheck ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=fetch /usr/local/bin/typst /usr/local/bin/gitleaks /usr/local/bin/actionlint \

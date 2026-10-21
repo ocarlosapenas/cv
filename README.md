@@ -41,6 +41,29 @@ For each variant `backend`, `ai`, `fde`, under `build/<variant>/`:
 - `make private` builds PDFs with private contact details into `build/private/`.
   They are never published.
 
+## CI and releases
+
+Every workflow builds the same pinned image from `tools/Dockerfile` and runs the same
+`make` targets as the local machine.
+
+| Workflow | When | What |
+|---|---|---|
+| `pr.yml` | every pull request | commit rule on every commit; `make check`, LinkedIn limits; a sticky comment with page images, a visual diff and a text diff against the base branch |
+| `security.yml` | PRs, pushes to `main`, weekly | `make lint` (gitleaks over the whole history, codespell, actionlint, zizmor) and `make scan-history` |
+| `links.yml` | weekly, PRs that change `cv.yaml` | `make links`: lychee over `cv.yaml` and the links inside each PDF |
+| `release.yml` | pushes to `main` that change the CV | builds, checks and gates, then creates a **draft** release; publishing stays manual |
+| `reminder.yml` | quarterly | opens a "Quarterly CV review" issue |
+
+Releases use CalVer `YYYY.MM.DD-NN`, printed in every PDF footer and checked on every
+page. A release is blocked while any claim in `cv.yaml` has `status: verify`
+(`make release-gate`). A pull request labelled `skip-release` does not create a draft.
+Each release carries a constant name per variant plus a dated copy, so these links
+always point to the newest published release:
+
+- `https://github.com/ocarlosapenas/cv/releases/latest/download/Carlos-Apenas-Resume-Backend.pdf`
+- `https://github.com/ocarlosapenas/cv/releases/latest/download/Carlos-Apenas-Resume-AI.pdf`
+- `https://github.com/ocarlosapenas/cv/releases/latest/download/Carlos-Apenas-Resume-FDE.pdf`
+
 ## Privacy
 
 See [CONFIDENTIALITY.md](CONFIDENTIALITY.md). In short: no phone or address in this
