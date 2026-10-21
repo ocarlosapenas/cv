@@ -60,3 +60,22 @@ def test_comment_truncates_long_diff():
 def test_comment_shows_blocked_gate():
     body = render([variant("backend", SAME)], {}, BLOCKED)
     assert BLOCKED in body
+
+
+RUN_URL = "https://github.com/ocarlosapenas/cv/actions/runs/123"
+
+
+def test_comment_with_artifact_link_has_no_images():
+    diff = "@@ -1 +1 @@\n-Old bullet\n+New bullet\n"
+    body = render([variant("backend", CHANGED), variant("ai", SAME)], {"backend": diff}, READY, artifact_url=RUN_URL)
+    assert "![" not in body
+    assert f"[this run]({RUN_URL})" in body
+    assert "`cv-preview`" in body
+    assert "| backend | 2/2 | 2 |" in body
+    assert "```diff\n" + diff in body
+
+
+def test_artifact_mode_skips_empty_variant_sections():
+    body = render([variant("backend", SAME), variant("ai", SAME)], {"backend": "", "ai": ""}, READY, artifact_url=RUN_URL)
+    assert "### " not in body
+    assert "No visual or text changes." in body
