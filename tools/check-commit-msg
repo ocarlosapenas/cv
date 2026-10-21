@@ -1,0 +1,28 @@
+#!/bin/sh
+# Commit subject rule for this repository, shared by the commit-msg hook and CI.
+# Usage: tools/check-commit-msg <message-file>
+#
+# The message must be exactly one line matching RULE: no scope, no body, no trailer,
+# and no special character other than the colon after the type.
+set -eu
+
+RULE='^(feat|fix|chore): [A-Za-z0-9 ]+$'
+
+# Drop git's comment lines and everything from the scissors line (git commit -v) on,
+# then leading and trailing blank lines, as git itself does before recording.
+message=$(sed -e '/^# -* >8 -*$/,$d' -e '/^#/d' "$1" | awk '
+  { line[NR] = $0; if ($0 ~ /[^[:space:]]/) { if (!first) first = NR; last = NR } }
+  END { if (first) for (i = first; i <= last; i++) print line[i] }')
+
+fail() {
+  echo "commit message rejected: $1" >&2
+  echo "  rule: one line matching $RULE" >&2
+  if [ -n "$message" ]; then
+    echo "  got:  $(printf '%s\n' "$message" | head -n 1)" >&2
+  fi
+  exit 1
+}
+
+[ -n "$message" ] || fail "empty message"
+[ "$(printf '%s\n' "$message" | wc -l | tr -d ' ')" -eq 1 ] || fail "more than one line (no body, no trailers)"
+printf '%s\n' "$message" | grep -Eq "$RULE" || fail "subject does not match the rule"

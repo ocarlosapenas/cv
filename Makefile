@@ -22,7 +22,7 @@ SKILLS_CONFIG := --config skills.yaml $(if $(wildcard private/skills-private.yam
 # Most recent LinkedIn data export copied into private/linkedin/<date>/ (if any).
 LINKEDIN_EXPORT := $(lastword $(sort $(wildcard private/linkedin/*/Positions.csv)))
 
-.PHONY: build test check private clean skills match linkedin release-gate release-assets
+.PHONY: build test check private clean skills match linkedin release-gate release-assets lint hooks
 
 ## build: render every variant to build/<variant>/{resolved.json,cv.pdf,resume.json}
 build:
@@ -58,6 +58,19 @@ release-assets:
 	rm -rf build/release
 	$(RUN) python3 scripts/release_assets.py --copy build --out build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
 	$(RUN) python3 scripts/release_assets.py --verify build/release --tag $(VERSION) --variants "$(RELEASE_VARIANTS)"
+
+## lint: secrets in the whole history, spelling, and workflow lint (the same as CI)
+lint:
+	$(RUN) gitleaks git --redact --no-banner --log-opts=--all .
+	$(RUN) sh -c 'git ls-files -z | xargs -0 codespell'
+	@if [ -d .github/workflows ]; then \
+	  $(RUN) actionlint && $(RUN) zizmor --offline .github/workflows; \
+	fi
+
+## hooks: enable the git hooks in .githooks/ (commit rule, secrets, deny-list, spelling)
+hooks:
+	git config core.hooksPath .githooks
+	@echo "core.hooksPath = $$(git config --get core.hooksPath)"
 
 ## private: build PDFs with private contact data into build/private/ (never published)
 private:

@@ -31,6 +31,13 @@ For each variant `backend`, `ai`, `fde`, under `build/<variant>/`:
 
 - Edit `cv.yaml` (schema: `schemas/cv.schema.json`; conventions at the top of the file).
 - `make check` before every commit.
+- `make hooks` once per clone enables the git hooks in `.githooks/`:
+  - `commit-msg`: one-line subjects matching `^(feat|fix|chore): [A-Za-z0-9 ]+$`
+    (no scope, no body, no trailers);
+  - `pre-commit`: gitleaks on the staged diff, the deny-list and codespell on staged
+    text files, actionlint and zizmor when a workflow changes, and `make check` when
+    the CV, template, scripts, schemas or toolchain change.
+- `make lint` runs the same tools over the whole tree and history, as CI does.
 - `make private` builds PDFs with private contact details into `build/private/`.
   They are never published.
 
