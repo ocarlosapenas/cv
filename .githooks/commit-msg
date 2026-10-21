@@ -1,0 +1,3 @@
+#!/bin/sh
+# Commit subject rule (see tools/check-commit-msg). Enabled by `make hooks`.
+exec tools/check-commit-msg "$1"

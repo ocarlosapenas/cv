@@ -1,0 +1,30 @@
+#!/bin/sh
+# Checks on the staged changes, all inside the pinned image (tools/run).
+# Enabled by `make hooks`. CI runs the same tools over the whole tree (make lint).
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -n "$staged" ] || exit 0
+
+# Secrets in the staged diff (the finding is redacted in the output).
+tools/run gitleaks git --pre-commit --staged --redact --no-banner .
+
+# Text files only: git grep -I skips binary files. Paths in this repo have no spaces.
+text=$(printf '%s\n' "$staged" | tr '\n' '\0' | xargs -0 git grep -I --cached -l -e '' -- 2>/dev/null || true)
+if [ -n "$text" ]; then
+  # Confidential terms: reported by deny-list line number, never by the term.
+  # shellcheck disable=SC2086
+  tools/run python3 scripts/check_denylist.py --denylist private/denylist.local $text
+  # shellcheck disable=SC2086
+  tools/run codespell $text
+fi
+
+if printf '%s\n' "$staged" | grep -q '^\.github/workflows/'; then
+  tools/run actionlint
+  tools/run zizmor --offline .github/workflows
+fi
+
+if printf '%s\n' "$staged" | grep -Eq '^(cv\.yaml|skills\.yaml|template/|scripts/|schemas/|tools/)'; then
+  make check
+fi
