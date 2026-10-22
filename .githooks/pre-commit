@@ -13,11 +13,21 @@ tools/run gitleaks git --pre-commit --staged --redact --no-banner .
 # Text files only: git grep -I skips binary files. Paths in this repo have no spaces.
 text=$(printf '%s\n' "$staged" | tr '\n' '\0' | xargs -0 git grep -I --cached -l -e '' -- 2>/dev/null || true)
 if [ -n "$text" ]; then
+  # Scan what is staged, not the working copy (they differ after `git add -p`): each
+  # staged text file is written under build/.staged/ (gitignored, visible to tools/run).
+  trap 'rm -rf build/.staged' EXIT
+  rm -rf build/.staged
+  copies=""
+  for f in $text; do
+    mkdir -p "build/.staged/$(dirname "$f")"
+    git show ":$f" > "build/.staged/$f"
+    copies="$copies build/.staged/$f"
+  done
   # Confidential terms: reported by deny-list line number, never by the term.
   # shellcheck disable=SC2086
-  tools/run python3 scripts/check_denylist.py --denylist private/denylist.local $text
+  tools/run python3 scripts/check_denylist.py --denylist private/denylist.local $copies
   # shellcheck disable=SC2086
-  tools/run codespell $text
+  tools/run codespell $copies
 fi
 
 if printf '%s\n' "$staged" | grep -q '^\.github/workflows/'; then
