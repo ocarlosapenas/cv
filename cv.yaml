@@ -149,11 +149,11 @@ work:
         tags: [backend, fde, linkedin]
       - text: Created an org-wide GitHub Actions quality gate (Infection mutation testing, PHPStan, PHPMD, Deptrac) and raised a mutation score from 69% to 93% as an acceptance criterion.
         tags: [backend, linkedin]
-      - text: Integrated Stripe billing, delivered PCI DSS SAQ A remediation in production, and closed 26 of 29 dependency security advisories with self-hosted Renovate.
+      - text: Integrated Stripe billing, led the PCI DSS SAQ A remediation through confirmation by moving card entry to Stripe's Payment Element with a per-tenant canary rollout, and closed 26 of 29 dependency security advisories with self-hosted Renovate.
         tags: [backend, fde]
       - text: Built Claude Code skills (some over 1,000 lines) and MCP-based tooling used for branch creation, the weekly release train and the dependency security cycle.
         tags: [ai, fde, linkedin]
-      - text: Run multi-agent workflows on legacy multi-repository code with worktree-per-epic isolation, adversarial review by a fresh agent and a triple-evidence rule before any conclusion is accepted.
+      - text: Run multi-agent workflows on legacy multi-repository code with worktree-per-epic isolation, adversarial review by a fresh agent and a triple-evidence rule; with one coordinating session dispatching approval-gated agent sessions, led a payments compliance epic across several repositories to production in three weeks.
         tags: [ai, linkedin]
       - text: Analyzed agent failures (fabricated output, out-of-scope actions, silent scheduled-task failures) and turned each one into a guardrail.
         tags: [ai]
