@@ -167,8 +167,6 @@ linkedin_top_skills:
 
 # Skills that stay on LinkedIn by decision although they are not on the CV (exact
 # names, so the lowercase "git" with its own Skill Assessment badge is kept too).
-# Not listed here, so still suggested for removal until decided: Desenvolvimento de
-# software, CSS, Electron (nodejs).
 linkedin_skills_keep:
   - Learning
   - Pipelines
@@ -182,3 +180,6 @@ linkedin_skills_keep:
   - OOP (Conceitos de orientação a objetos)
   - Controle de versão
   - git
+  - Desenvolvimento de software
+  - CSS
+  - Electron (nodejs)
