@@ -67,6 +67,11 @@ jobs:
       - name: Secrets, spelling and workflow lint
         run: make lint
 
+      # Pull request refs (refs/pull/*/head) stay readable after a PR is closed, so the
+      # scan covers them too. The repository is public, so the fetch needs no token.
+      - name: Fetch pull request refs
+        run: git fetch --no-tags --quiet origin '+refs/pull/*/head:refs/remotes/origin/pr/*'
+
       - name: Confidentiality scan of the whole history
         run: make scan-history
 

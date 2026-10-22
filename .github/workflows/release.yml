@@ -22,7 +22,8 @@ permissions: {}
 jobs:
   draft:
     name: draft
-    if: github.event_name != 'release'
+    # Drafts come from main only, also when the workflow is started by hand.
+    if: github.event_name != 'release' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
