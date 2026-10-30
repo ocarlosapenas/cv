@@ -1,8 +1,8 @@
 # Design
 
 CV as code: one data file, three role variants, verified outputs. This document
-explains how the pieces fit and why. Phase 0 research and decisions D1–D14 are kept
-out of git (`private/research/`); the decisions are summarized below.
+explains how the pieces fit and why. Research notes (Phase 0 and later) are kept out
+of git (`private/research/`); decisions D1–D16 are summarized below.
 
 ## Data flow
 
@@ -39,6 +39,29 @@ The render model (`resolved.json`) is the only input of every output. Variant lo
 | D12 | Content rewrite applying the research checklist | Phase 2 |
 | D13 | Flagship SDK + evals project | Icebox (outside this repository) |
 | D14 | Repository starts private; full-history scan before going public | Phase 1 → 3 |
+| D15 | LinkedIn headline keeps the "Senior" level and states scope with facts from the CV | 2026-10-30 (`basics.label.linkedin`; see positioning research) |
+| D16 | LLM frameworks (LangChain, LangGraph, Langfuse) stay out of Skills until a project shows them | 2026-10-30 (`skills.yaml` vocabulary only) |
+
+## Positioning research (2026-10-30)
+
+Research on title level, LLM frameworks and the 2026 job market. The notes stay in
+`private/research/`; this section keeps the decisions and their public sources.
+
+- **D15, headline level.** Staff is defined by scope across teams (direction,
+  standards, growing other engineers), not by years
+  ([StaffEng](https://staffeng.com/guides/staff-archetypes/),
+  [GitLab handbook](https://handbook.gitlab.com/job-families/engineering/backend-engineer/)).
+  In forward-deployed engineer postings that state experience, 9+ years is 8% and 3–5
+  years is 60% ([Bloomberry](https://bloomberry.com/blog/i-analyzed-1000-forward-deployed-engineer-jobs-what-i-learned/)).
+  The headline keeps "Senior" and states scope with facts that `cv.yaml` already shows:
+  AWS infrastructure, releases and traffic.
+- **D16, LLM frameworks.** LangChain is the framework that postings name most, but it
+  is in 18.8% of AI engineer postings
+  ([Grigorev and Kuka](https://aishippingblog.com/p/what-1000-job-descriptions-reveal))
+  and 4% of forward-deployed engineer postings (Bloomberry). Python and RAG appear far
+  more often. LangChain, LangGraph and Langfuse are only in the `skills.yaml`
+  vocabulary, so `make match` reports them as gaps. They enter the CV only with a
+  project that shows them (D13).
 
 ## Deviations from the approved decisions
 

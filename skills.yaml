@@ -84,6 +84,8 @@ vocabulary:
   - embeddings
   - fine-tuning
   - LangChain
+  - LangGraph
+  - Langfuse
   - PyTorch
   - Machine Learning
 
