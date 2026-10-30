@@ -127,3 +127,38 @@ def test_checklist_skills_add_and_remove_with_aliases(doc):
     items = checklist(build_texts(linkedin_model(doc), CONFIG), EXPORT, CONFIG)
     assert items["skills_add"] == ["PHP"]
     assert items["skills_remove"] == ["laravel (duplicate)", "Bitcoin"]
+
+
+def test_same_text_ignores_paragraph_breaks_dropped_by_the_export():
+    from linkedin_texts import same_text
+
+    # The LinkedIn data export joins paragraphs with no separator at all.
+    assert same_text("First paragraph.\n\nSecond paragraph.", "First paragraph.Second paragraph.")
+    assert same_text("Led  the move\nto AWS.", "Led the move to AWS.")
+    assert not same_text("Led the move to AWS.", "Led the move to GCP.")
+    assert not same_text("", "Something")
+
+
+def test_checklist_description_ignores_dropped_paragraph_breaks(doc):
+    texts = build_texts(linkedin_model(doc), CONFIG)
+    acme = next(e for e in texts["experience"] if e["company"] == "Acme Corp")
+    assert "\n" in acme["description"]
+    current = {"work": [{"name": "Acme Corp", "position": acme["title"], "startDate": acme["start"],
+                         "location": acme["location"], "summary": acme["description"].replace("\n", "")}]}
+    items = checklist(texts, current, CONFIG)
+    changes = next(i for i in items["experience"] if i["company"] == "Acme Corp")["changes"]
+    assert not any(c.startswith("description") for c in changes)
+
+
+def test_checklist_about_up_to_date_when_only_paragraph_breaks_differ(doc, tmp_path):
+    from linkedin_texts import write_outputs
+
+    doc["basics"]["summary"] = {"default": "Short.", "linkedin": "First paragraph.\n\nSecond paragraph."}
+    doc["meta"]["variants"]["linkedin"] = {"sections": ["summary", "work", "volunteer", "skills", "education"]}
+    doc["basics"]["label"]["linkedin"] = "Senior Backend Engineer | PHP, Laravel, AWS"
+    texts = build_texts(resolve(doc, "linkedin"), CONFIG)
+    current = {"basics": {"label": texts["headline"], "summary": "First paragraph.Second paragraph."}}
+    write_outputs(texts, check_limits(texts), checklist(texts, current, CONFIG), str(tmp_path))
+    text = (tmp_path / "checklist.md").read_text()
+    assert "- [x] About: already up to date" in text
+    assert "- [x] Headline: already up to date" in text

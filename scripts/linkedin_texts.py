@@ -111,6 +111,17 @@ def _norm(text):
     return " ".join((text or "").split())
 
 
+def same_text(a, b):
+    """True when two texts differ only in whitespace.
+
+    The LinkedIn data export drops paragraph breaks with no separator ("teams.Today"),
+    so texts are also compared with all whitespace removed.
+    """
+    if _norm(a) == _norm(b):
+        return True
+    return re.sub(r"\s+", "", a or "") == re.sub(r"\s+", "", b or "")
+
+
 def _match(items, current, start_key="startDate", name_key="name"):
     """Pair each CV item with a current LinkedIn item: same start date, else same name."""
     pairs, used = [], set()
@@ -145,7 +156,7 @@ def _changes(pairs, fields):
             # date is meaningful when empty (a current role).
             if not mine and label != "end":
                 continue
-            if _norm(mine) != _norm(theirs):
+            if not same_text(mine, theirs):
                 if label == "description":
                     changes.append(f"description: replace ({len(mine or '')} chars)")
                 else:
@@ -259,7 +270,7 @@ def write_outputs(texts, limits, items, out):
     if items is not None:
         c = ["# LinkedIn update checklist", "", "Current profile (from the data export) versus cv.yaml. Every edit is manual.", ""]
         for key in ("headline", "about"):
-            same = _norm(items[key]["current"]) == _norm(items[key]["new"])
+            same = same_text(items[key]["current"], items[key]["new"])
             c.append(f"- [{'x' if same else ' '}] {key.title()}: {'already up to date' if same else 'replace (see profile.md)'}")
         c += ["", "## Experience", ""]
         for e in items["experience"]:
