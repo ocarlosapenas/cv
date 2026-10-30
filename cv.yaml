@@ -31,7 +31,7 @@ basics:
     default: Senior Backend and DevOps Engineer
     ai: Senior Backend Engineer, agentic engineering on production systems
     fde: Senior Backend Engineer, production systems end to end
-    linkedin: Senior Backend Engineer | PHP, Laravel, Linux, AWS | Agentic engineering on production systems | Root cause analysis and postmortems
+    linkedin: Senior Backend and DevOps Engineer | PHP, Laravel, AWS, Linux | Runs AWS infrastructure and releases for a 20M+ pageviews/day platform | Agentic engineering with Claude Code and MCP | Root cause analysis
   email: cv@carlosapenas.dev
   url: https://carlosapenas.dev
   location:
